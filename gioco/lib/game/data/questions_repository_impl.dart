@@ -8,13 +8,14 @@ import 'package:gioco/game/data/questions_constants.dart';
 import 'package:gioco/game/domain/model/question_domain_model.dart';
 import 'package:gioco/game/domain/repository/questions_repository.dart';
 import 'package:gioco/game/presentation/widget/section.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class QuestionsRepositoryImpl extends QuestionsRepository {
-  /// Number of questions that the user has answered correctly
-  int correctAnswers = 0;
+  final SharedPreferences sharedPreferences;
 
-  /// The score starts at 0, it is saved every time if it is an high score
-  int score = 0;
+  QuestionsRepositoryImpl({
+    @required this.sharedPreferences,
+  });
 
   @override
   Either<Failure, QuestionDomainModel> getRandomQuestion({
@@ -50,6 +51,8 @@ class QuestionsRepositoryImpl extends QuestionsRepository {
           )
           .toList();
 
+      saveScore(currentScore);
+
       return Right(
         QuestionDomainModel(
           generatedColor: correctAnswer,
@@ -60,6 +63,13 @@ class QuestionsRepositoryImpl extends QuestionsRepository {
       );
     } catch (e) {
       return Left(Failure());
+    }
+  }
+
+  void saveScore(int currentScore) async {
+    final max = sharedPreferences.getInt(QuestionsConstants.MAX_SCORE_KEY);
+    if (max == null || currentScore > max) {
+      sharedPreferences.setInt(QuestionsConstants.MAX_SCORE_KEY, currentScore);
     }
   }
 
@@ -95,5 +105,16 @@ class QuestionsRepositoryImpl extends QuestionsRepository {
     }
 
     return Tuple3(points, timeToAnswer, answersToGenerate);
+  }
+
+  @override
+  Either<Failure, int> getRecordPoints() {
+    try {
+      final score =
+          sharedPreferences.getInt(QuestionsConstants.MAX_SCORE_KEY) ?? 0;
+      return Right(score);
+    } catch (e) {
+      return Left(Failure(errorMessage: e.toString()));
+    }
   }
 }

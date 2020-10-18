@@ -1,13 +1,7 @@
 import 'dart:math' as math;
 
-import 'package:dartz/dartz.dart' show Tuple2;
 import 'package:flutter/material.dart';
 import 'package:gioco/game/presentation/widget/section.dart';
-
-typedef OnCorrectAnswer(Color color);
-
-/// Correct answer, User given answer
-typedef OnWrongAnswer(Tuple2<Color, Color> wrongAndCorrectColor);
 
 class AnswerCircleSectionCustomPainter extends CustomPainter {
   static const double CENTER_SPACE_RADIUS = 120.0;

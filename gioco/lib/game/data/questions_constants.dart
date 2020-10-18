@@ -13,6 +13,8 @@ class QuestionsConstants {
 
   static const int DIFFICULTY_ONLY_AI = 40;
 
+  static const String MAX_SCORE_KEY = 'maxScore';
+
   static const int EASY_POINTS = 1;
   static const int EASY_TIME_TO_ANSWER = 3000;
   static const int EASY_ANSWERS = 4;
@@ -26,7 +28,7 @@ class QuestionsConstants {
   static const int HARD_ANSWERS = 6;
 
   static const int EXTREME_POINTS = 10;
-  static const int EXTREME_TIME_TO_ANSWER = 1800;
+  static const int EXTREME_TIME_TO_ANSWER = 1000;
   static const int EXTREME_ANSWERS = 8;
 
   static const int AI_POINTS = 50;

@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class GColors {
+  static Color get primary => Color(0xff121212);
+
   static List<Color> getRandomList(int length) {
     List<Color> generatedColors = [];
 

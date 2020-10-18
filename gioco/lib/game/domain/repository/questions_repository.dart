@@ -8,4 +8,6 @@ abstract class QuestionsRepository {
   Either<Failure, QuestionDomainModel> getRandomQuestion({
     @required int currentScore,
   });
+
+  Either<Failure, int> getRecordPoints();
 }

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gioco/game/data/questions_constants.dart';
@@ -8,15 +6,14 @@ import 'package:gioco/game/domain/repository/questions_repository.dart';
 
 void main() {
   group('correct question generation', () {
-    final QuestionsRepository questionsRepository = QuestionsRepositoryImpl();
+    final QuestionsRepository questionsRepository = QuestionsRepositoryImpl(
+      sharedPreferences: null,
+    );
 
     List questionRList = [];
 
-    Random random = Random();
-
     for (int i = 0; i < 100; i++) {
-      questionRList.add(questionsRepository.getRandomQuestion(
-          currentScore: random.nextInt(50)));
+      questionRList.add(questionsRepository.getRandomQuestion(currentScore: 0));
     }
 
     test('avoid duplicate colors in possible answers', () {});
@@ -42,7 +39,9 @@ void main() {
   });
 
   group('correct question difficulty', () {
-    final questionsRepository = QuestionsRepositoryImpl();
+    final questionsRepository = QuestionsRepositoryImpl(
+      sharedPreferences: null,
+    );
 
     bool checkEasyConditions(Tuple3 params) {
       return params.value1 == QuestionsConstants.EASY_POINTS &&

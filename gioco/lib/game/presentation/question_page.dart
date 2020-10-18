@@ -1,31 +1,35 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:audioplayers/audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:gioco/core/failures.dart';
 import 'package:gioco/game/domain/model/question_domain_model.dart';
 import 'package:gioco/game/domain/usecase/get_question_usecase.dart';
 import 'package:gioco/game/presentation/widget/painters/answer_circle_section_painter.dart';
 import 'package:gioco/game/presentation/widget/section.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class ColorsPage extends StatefulWidget {
+class QuestionPage extends StatefulWidget {
   final GetQuestionUseCase getQuestionUseCase;
+  final VoidCallback stopGame;
 
-  const ColorsPage({
+  const QuestionPage({
     Key key,
     @required this.getQuestionUseCase,
+    @required this.stopGame,
   }) : super(key: key);
 
   @override
-  _ColorsPageState createState() => _ColorsPageState();
+  _QuestionPageState createState() => _QuestionPageState();
 }
 
-class _ColorsPageState extends State<ColorsPage> {
+class _QuestionPageState extends State<QuestionPage> {
   /// The number of colors that the user has tapped correctly
   int score = 0;
 
-  /// If the user has tapped the correct number it shows the
-  /// reaction time in milliseoncs
-  // int reactionTime = 0;
+  Color scaffoldColor = Color(0xff121212);
 
   /// The generated question
   QuestionDomainModel question;
@@ -40,17 +44,40 @@ class _ColorsPageState extends State<ColorsPage> {
   /// Reamaining seconds that the user has to answer the question
   int remainingSeconds;
 
+  File correctAudioFile;
+
+  File wrongAudioFile;
+
   @override
   void initState() {
     super.initState();
-
     // get the new question from the repository
     getNewQuestion(cancelCountdown: false);
+
+    setupAudio();
+  }
+
+  void setupAudio() async {
+    AudioCache player = AudioCache();
+
+    final correctAudio = await player.load(
+      'sfx/correct.mp3',
+    );
+
+    final wrongAudio = await player.load(
+      'sfx/wrong.mp3',
+    );
+
+    setState(() {
+      correctAudioFile = correctAudio;
+      wrongAudioFile = wrongAudio;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: scaffoldColor,
       body: SafeArea(
         child: Stack(
           children: [
@@ -62,7 +89,7 @@ class _ColorsPageState extends State<ColorsPage> {
                   children: [
                     Text(
                       '$score',
-                      style: TextStyle(
+                      style: GoogleFonts.pressStart2p(
                         fontSize: 48,
                       ),
                     ),
@@ -71,9 +98,9 @@ class _ColorsPageState extends State<ColorsPage> {
                     ),
                     if (remainingSeconds > 0)
                       Text(
-                        '$remainingSeconds seconds remaining',
-                        style: TextStyle(
-                          fontSize: 16,
+                        '$remainingSeconds seconds remaining'.toUpperCase(),
+                        style: GoogleFonts.pressStart2p(
+                          fontSize: 12,
                         ),
                       ),
                   ],
@@ -116,17 +143,9 @@ class _ColorsPageState extends State<ColorsPage> {
     return GestureDetector(
       onTap: () {
         if (section.color == question.generatedColor) {
-          setState(() {
-            score += 1;
-          });
-
-          getNewQuestion();
+          reactToCorrectAnswer();
         } else {
-          setState(() {
-            score = 0;
-          });
-
-          getNewQuestion();
+          reactToWrongAnswer();
         }
       },
       child: CustomPaint(
@@ -141,24 +160,29 @@ class _ColorsPageState extends State<ColorsPage> {
     );
   }
 
-  Future<void> reactToCorrectAnswer(Color correctColor) async {
+  Future<void> reactToCorrectAnswer() async {
     setState(() {
       score += 1;
     });
 
-    await Future.delayed(Duration(milliseconds: 1000));
+    // play the audio
+    final player = AudioPlayer();
+    player.play(correctAudioFile.path, isLocal: true);
 
     getNewQuestion();
   }
 
-  Future<void> reactToWrongAnswer(Color wronwColor, Color correctColor) async {
+  Future<void> reactToWrongAnswer() async {
     setState(() {
       score = 0;
+      scaffoldColor = Colors.red[800];
     });
 
-    await Future.delayed(Duration(milliseconds: 1000));
+    final player = AudioPlayer();
+    player.play(wrongAudioFile.path, isLocal: true);
 
-    getNewQuestion();
+    await Future.delayed(Duration(milliseconds: 300));
+    widget.stopGame();
   }
 
   void getNewQuestion({
@@ -187,23 +211,21 @@ class _ColorsPageState extends State<ColorsPage> {
   void startAnswerCountdownTimer() {
     countdownTimer = Timer.periodic(
       Duration(seconds: 1),
-      (timer) {
-        if (remainingSeconds < 1) {
+      (timer) async {
+        if (remainingSeconds <= 1) {
           timer.cancel();
 
           setState(() {
             score = 0;
           });
 
-          // showDialog(
-          //   context: context,
-          //   builder: (context) {
-          //     return AlertDialog(
-          //       title: Text('Countdown expired!'),
-          //       content: Text('Retry next time.'),
-          //     );
-          //   },
-          // );
+          AudioCache player = AudioCache();
+
+          await player.play(
+            'sfx/time.mp3',
+          );
+
+          widget.stopGame();
         } else {
           setState(() => remainingSeconds = remainingSeconds - 1);
         }

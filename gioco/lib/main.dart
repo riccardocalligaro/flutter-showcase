@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:gioco/game/data/questions_repository_impl.dart';
-import 'package:gioco/game/domain/usecase/get_question_usecase.dart';
-import 'package:gioco/game/presentation/colors_page.dart';
+import 'package:gioco/core/extension/colors_ext.dart';
+import 'package:gioco/game/game_container.dart';
+import 'package:gioco/game/presentation/game_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await GameContainer.init();
+
   runApp(ColorsGame());
 }
 
@@ -16,15 +20,11 @@ class ColorsGame extends StatelessWidget {
       title: 'Colors game',
       theme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: Color(0xff121212),
+        scaffoldBackgroundColor: GColors.primary,
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ColorsPage(
-        getQuestionUseCase: GetQuestionUseCase(
-          questionsRepository: QuestionsRepositoryImpl(),
-        ),
-      ),
+      home: GamePage(),
     );
   }
 }

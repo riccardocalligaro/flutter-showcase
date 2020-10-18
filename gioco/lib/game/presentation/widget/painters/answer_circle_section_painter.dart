@@ -22,22 +22,29 @@ class AnswerCircleSectionCustomPainter extends CustomPainter {
 
   Path path;
 
+  double sectionAngle;
+
+  int length;
+
   AnswerCircleSectionCustomPainter({
     @required this.index,
     @required this.section,
+    @required this.sectionAngle,
+    @required this.length,
   }) {
     _sectionPaint = Paint()..style = PaintingStyle.stroke;
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    _drawSection(canvas, size, 90);
+    _drawSection(canvas, size, sectionAngle);
   }
 
   void _drawSection(Canvas canvas, Size viewSize, double sectionAngle) {
     final Offset center = Offset(viewSize.width / 2, viewSize.height / 2);
 
     path = Path();
+
     double tempAngle = 0;
 
     final sectionDegree = sectionAngle;
@@ -50,16 +57,14 @@ class AnswerCircleSectionCustomPainter extends CustomPainter {
     _sectionPaint.color = section.color;
     _sectionPaint.strokeWidth = section.radius;
 
-    if (index == 0) {
-      tempAngle = -90;
-    } else if (index == 1) {
-      tempAngle = 0;
-    } else if (index == 2) {
-      tempAngle = 90;
-    } else {
-      tempAngle = 180;
+    tempAngle = -sectionAngle;
+
+    if (index >= 1) {
+      tempAngle += (tempAngle * index);
     }
+
     final double sweepAngle = sectionDegree;
+
     canvas.drawArc(
       rect,
       radians(tempAngle),
@@ -68,38 +73,36 @@ class AnswerCircleSectionCustomPainter extends CustomPainter {
       _sectionPaint,
     );
 
-    double tempPath = tempAngle - 15;
-    double tempSweep = sweepAngle + 15;
-    path.arcTo(
-      Rect.fromCircle(
-        center: center,
-        radius: _calculateCenterRadiusPath(viewSize, 165.0),
-      ),
-      radians(tempPath),
-      radians(tempSweep),
-      false,
-    );
+    if (length == 4) {
+      for (int j = 0; j <= 40; j += 5) {
+        path.arcTo(
+          Rect.fromCircle(
+            center: center,
+            radius: _calculateCenterRadius(viewSize, CENTER_SPACE_RADIUS) + j,
+          ),
+          radians(tempAngle),
+          radians(sweepAngle),
+          false,
+        );
+      }
+    } else {
+      for (int j = -10; j <= 40; j += 5) {
+        path.arcTo(
+          Rect.fromCircle(
+            center: center,
+            radius: _calculateCenterRadius(viewSize, CENTER_SPACE_RADIUS) + j,
+          ),
+          radians(tempAngle - 5),
+          radians(sweepAngle + 7),
+          false,
+        );
+      }
+    }
   }
 
   @override
   bool hitTest(Offset position) {
-    print(path.contains(position));
     return path.contains(position);
-  }
-
-  double _calculateCenterRadiusPath(Size viewSize, double givenCenterRadius) {
-    if (!givenCenterRadius.isInfinite) {
-      return givenCenterRadius;
-    }
-
-    double maxRadius = 0;
-    if (section.radius > maxRadius) {
-      maxRadius = section.radius;
-    }
-
-    final minWidthHeight = math.min(viewSize.width, viewSize.height);
-    final centerRadius = (minWidthHeight - (maxRadius * 2)) / 2;
-    return centerRadius;
   }
 
   double _calculateCenterRadius(Size viewSize, double givenCenterRadius) {

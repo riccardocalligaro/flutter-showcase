@@ -14,7 +14,7 @@ class GColors {
           null) {
         color = getRandom();
       }
-      generatedColors.add(getRandom());
+      generatedColors.add(color);
     }
 
     return generatedColors;

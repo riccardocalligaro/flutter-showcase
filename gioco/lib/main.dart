@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gioco/game/data/questions_repository_impl.dart';
+import 'package:gioco/game/domain/usecase/get_question_usecase.dart';
 import 'package:gioco/game/presentation/colors_page.dart';
 
 void main() {
@@ -20,7 +21,9 @@ class ColorsGame extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: ColorsPage(
-        questionsRepository: QuestionsRepositoryImpl(),
+        getQuestionUseCase: GetQuestionUseCase(
+          questionsRepository: QuestionsRepositoryImpl(),
+        ),
       ),
     );
   }

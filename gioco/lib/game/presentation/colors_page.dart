@@ -3,16 +3,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gioco/core/failures.dart';
 import 'package:gioco/game/domain/model/question_domain_model.dart';
-import 'package:gioco/game/domain/repository/questions_repository.dart';
+import 'package:gioco/game/domain/usecase/get_question_usecase.dart';
 import 'package:gioco/game/presentation/widget/painters/answer_circle_section_painter.dart';
 import 'package:gioco/game/presentation/widget/section.dart';
 
 class ColorsPage extends StatefulWidget {
-  final QuestionsRepository questionsRepository;
+  final GetQuestionUseCase getQuestionUseCase;
 
   const ColorsPage({
     Key key,
-    @required this.questionsRepository,
+    @required this.getQuestionUseCase,
   }) : super(key: key);
 
   @override
@@ -25,7 +25,7 @@ class _ColorsPageState extends State<ColorsPage> {
 
   /// If the user has tapped the correct number it shows the
   /// reaction time in milliseoncs
-  int reactionTime = 0;
+  // int reactionTime = 0;
 
   /// The generated question
   QuestionDomainModel question;
@@ -39,8 +39,6 @@ class _ColorsPageState extends State<ColorsPage> {
 
   /// Reamaining seconds that the user has to answer the question
   int remainingSeconds;
-
-  bool hasAnsweredQuestion;
 
   @override
   void initState() {
@@ -90,6 +88,7 @@ class _ColorsPageState extends State<ColorsPage> {
   }
 
   List<Widget> buildQuestionItems() {
+    double sectionAngle = 360 / question.possibleAnswers.length;
     return [
       Center(
         child: Container(
@@ -101,17 +100,19 @@ class _ColorsPageState extends State<ColorsPage> {
           ),
         ),
       ),
+      // Text(question.possibleAnswers.length.toString()),
       ...question.possibleAnswers
           .asMap()
           .map(
-            (i, element) => MapEntry(i, buildAnswerCircle(i, element)),
+            (i, element) =>
+                MapEntry(i, buildAnswerCircle(i, element, sectionAngle)),
           )
           .values
           .toList(),
     ];
   }
 
-  Widget buildAnswerCircle(int index, Section section) {
+  Widget buildAnswerCircle(int index, Section section, double sectionAngle) {
     return GestureDetector(
       onTap: () {
         if (section.color == question.generatedColor) {
@@ -130,8 +131,10 @@ class _ColorsPageState extends State<ColorsPage> {
       },
       child: CustomPaint(
         painter: AnswerCircleSectionCustomPainter(
+          length: question.possibleAnswers.length,
           index: index,
           section: Section(color: section.color, radius: section.radius),
+          sectionAngle: sectionAngle,
         ),
         child: Container(),
       ),
@@ -140,7 +143,6 @@ class _ColorsPageState extends State<ColorsPage> {
 
   Future<void> reactToCorrectAnswer(Color correctColor) async {
     setState(() {
-      hasAnsweredQuestion = true;
       score += 1;
     });
 
@@ -151,7 +153,6 @@ class _ColorsPageState extends State<ColorsPage> {
 
   Future<void> reactToWrongAnswer(Color wronwColor, Color correctColor) async {
     setState(() {
-      hasAnsweredQuestion = true;
       score = 0;
     });
 
@@ -163,13 +164,15 @@ class _ColorsPageState extends State<ColorsPage> {
   void getNewQuestion({
     bool cancelCountdown = true,
   }) {
-    final questionResponse = widget.questionsRepository.getRandomQuestion();
+    final questionResponse =
+        widget.getQuestionUseCase.execute(GetQuestionUseCaseParams(
+      score,
+    ));
 
     questionResponse.fold((l) {
       setState(() => failure = l);
     }, (r) {
       setState(() {
-        hasAnsweredQuestion = false;
         question = r;
         remainingSeconds = question.timeToAnswer ~/ 1000;
       });
@@ -192,15 +195,15 @@ class _ColorsPageState extends State<ColorsPage> {
             score = 0;
           });
 
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('Countdown expired!'),
-                content: Text('Retry next time.'),
-              );
-            },
-          );
+          // showDialog(
+          //   context: context,
+          //   builder: (context) {
+          //     return AlertDialog(
+          //       title: Text('Countdown expired!'),
+          //       content: Text('Retry next time.'),
+          //     );
+          //   },
+          // );
         } else {
           setState(() => remainingSeconds = remainingSeconds - 1);
         }

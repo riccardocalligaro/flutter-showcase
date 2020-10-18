@@ -1,25 +1,15 @@
 import 'dart:math';
 
 import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 import 'package:gioco/core/extension/colors_ext.dart';
 import 'package:gioco/core/failures.dart';
+import 'package:gioco/game/data/questions_constants.dart';
 import 'package:gioco/game/domain/model/question_domain_model.dart';
 import 'package:gioco/game/domain/repository/questions_repository.dart';
 import 'package:gioco/game/presentation/widget/section.dart';
 
 class QuestionsRepositoryImpl extends QuestionsRepository {
-  /// 4 possible correct answers, 3 seconds to answer, 1 point
-  static const int DIFFICULTY_EASY = 1;
-
-  /// 6 possible correct answers, 3 seconds to answer, 2 points
-  static const int DIFFICULTY_MEDIUM = 5;
-
-  /// 6 possible correct answers, 2 seconds to answer, 5 points
-  static const int DIFFICULTY_HARD = 9;
-
-  /// 8 possible correct answers, 2 seconds to answer, 10 points
-  static const int DIFFICULTY_EXTREME = 11;
-
   /// Number of questions that the user has answered correctly
   int correctAnswers = 0;
 
@@ -27,22 +17,23 @@ class QuestionsRepositoryImpl extends QuestionsRepository {
   int score = 0;
 
   @override
-  Either<Failure, QuestionDomainModel> getRandomQuestion() {
+  Either<Failure, QuestionDomainModel> getRandomQuestion({
+    @required int currentScore,
+  }) {
     try {
       Random random = Random();
 
-      int answersToGenerate = 4;
+      final questionParams = getQuestionDifficultyParams(currentScore);
+
+      // easy = 1, medium = 2, hard = 5, extreme = 10
+      int points = questionParams.value1;
 
       // time in milliseconds to answer the question, changes with the
       // difficulty of the question
-      int timeToAnswer = 3000;
+      int timeToAnswer = questionParams.value2;
 
-      // easy = 1, medium = 2, hard = 5, extreme = 10
-      int points = 1;
-
-      // if (_correctAnswers <= DIFFICULTY_MEDIUM) {
-      //   answersToGenerate = 10;
-      // } else if (_correctAnswers <= 11) {}
+      /// numbers of possible questions
+      int answersToGenerate = questionParams.value3;
 
       // get a random list of generated colors
       final generatedColors = GColors.getRandomList(answersToGenerate);
@@ -70,5 +61,39 @@ class QuestionsRepositoryImpl extends QuestionsRepository {
     } catch (e) {
       return Left(Failure());
     }
+  }
+
+  /// Points, timeToAnswer, answers to generate
+  Tuple3<int, int, int> getQuestionDifficultyParams(int currentScore) {
+    // easy = 1, medium = 2, hard = 5, extreme = 10
+    int points = QuestionsConstants.EASY_POINTS;
+
+    // time in milliseconds to answer the question, changes with the
+    // difficulty of the question
+    int timeToAnswer = QuestionsConstants.EASY_TIME_TO_ANSWER;
+
+    int answersToGenerate = QuestionsConstants.EASY_ANSWERS;
+
+    if (currentScore >= QuestionsConstants.DIFFICULTY_MEDIUM &&
+        currentScore < QuestionsConstants.DIFFICULTY_HARD) {
+      answersToGenerate = QuestionsConstants.MEDIUM_ANSWERS;
+      points = QuestionsConstants.MEDIUM_POINTS;
+    } else if (currentScore >= QuestionsConstants.DIFFICULTY_HARD &&
+        currentScore < QuestionsConstants.DIFFICULTY_EXTREME) {
+      answersToGenerate = QuestionsConstants.HARD_ANSWERS;
+      points = QuestionsConstants.HARD_POINTS;
+      timeToAnswer = QuestionsConstants.HARD_TIME_TO_ANSWER;
+    } else if (currentScore >= QuestionsConstants.DIFFICULTY_EXTREME &&
+        currentScore < QuestionsConstants.DIFFICULTY_ONLY_AI) {
+      answersToGenerate = QuestionsConstants.EXTREME_ANSWERS;
+      points = QuestionsConstants.EXTREME_POINTS;
+      timeToAnswer = QuestionsConstants.EXTREME_TIME_TO_ANSWER;
+    } else if (currentScore >= QuestionsConstants.DIFFICULTY_ONLY_AI) {
+      answersToGenerate = QuestionsConstants.AI_ANSWERS;
+      points = QuestionsConstants.AI_POINTS;
+      timeToAnswer = QuestionsConstants.AI_TIME_TO_ANSWER;
+    }
+
+    return Tuple3(points, timeToAnswer, answersToGenerate);
   }
 }

@@ -1,4 +1,3 @@
-import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:gioco/game/domain/usecase/get_record_points_usecase.dart';
@@ -29,22 +28,6 @@ class _StartGamePageState extends State<StartGamePage> {
   @override
   void initState() {
     super.initState();
-
-    // playAudio();
-  }
-
-  void playAudio() async {
-    AudioCache player = AudioCache();
-
-    final audio = await player.loop(
-      'sfx/main_menu.mp3',
-      stayAwake: true,
-      volume: 0.5,
-    );
-
-    setState(() {
-      audioPlayer = audio;
-    });
   }
 
   @override
@@ -84,12 +67,14 @@ class _StartGamePageState extends State<StartGamePage> {
                 ),
               ),
             ),
-            StartGameAnimatedCircle(
-              getQuestionUseCase: sl(),
-              startGame: () {
-                // audioPlayer.stop();
-                widget.startGame();
-              },
+            Padding(
+              padding: const EdgeInsets.only(top: 82.0),
+              child: StartGameAnimatedCircle(
+                getQuestionUseCase: sl(),
+                startGame: () {
+                  widget.startGame();
+                },
+              ),
             ),
           ],
         ),
@@ -99,7 +84,7 @@ class _StartGamePageState extends State<StartGamePage> {
 
   @override
   void dispose() {
-    audioPlayer.stop();
+    // audioPlayer.stop();
 
     super.dispose();
   }

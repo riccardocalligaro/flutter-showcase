@@ -41,7 +41,7 @@ class _StartGameAnimatedCircleState extends State<StartGameAnimatedCircle>
       duration: Duration(seconds: 5),
     );
 
-    // _rotationController.repeat();
+    _rotationController.repeat();
 
     sectionAngle = 360 / question.possibleAnswers.length;
   }

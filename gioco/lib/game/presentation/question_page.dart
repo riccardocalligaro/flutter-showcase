@@ -107,7 +107,12 @@ class _QuestionPageState extends State<QuestionPage> {
                 ),
               ),
             ),
-            ...buildQuestionItems(),
+            Padding(
+              padding: const EdgeInsets.only(top: 82.0),
+              child: Stack(
+                children: buildQuestionItems(),
+              ),
+            )
           ],
         ),
       ),

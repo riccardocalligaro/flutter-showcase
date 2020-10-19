@@ -1,9 +1,9 @@
 name: gioco
-description: A new Flutter project.
+description: Simple flutter game.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+1
+version: 0.0.1+1
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -11,12 +11,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  # play sound effects
   audioplayers:
-  cupertino_icons: ^1.0.0
+  # functional programming in dart
   dartz: ^0.9.2
-  equatable: ^1.2.5
+  # dependency injection
   get_it: ^5.0.1
+  # google fonts to flutter
   google_fonts: ^1.1.1
+  # save user high score
   shared_preferences: ^0.5.12+2
 
 dev_dependencies:

@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
-import 'package:gioco/core/extension/colors_ext.dart';
+import 'package:gioco/core/extension/g_colors.dart';
 import 'package:gioco/core/failures.dart';
 import 'package:gioco/game/data/questions_constants.dart';
 import 'package:gioco/game/domain/model/question_domain_model.dart';

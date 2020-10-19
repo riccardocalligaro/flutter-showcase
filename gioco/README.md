@@ -71,6 +71,12 @@ Information is flown back to UI, to show the result.
 
 ### Testing
 
+I tried to follow [Test Driven Development - TDD](https://it.wikipedia.org/wiki/Test_driven_development) and test every function.
+
+With `flutter test` you can run all the tests.
+
+
+
 
 ### Functional programming
 
@@ -83,12 +89,34 @@ The dartz package, which I've added as a dependency, brings functional programmi
 This type can be used to represent any two types at the same time and it's just perfect for error handling, where L is the Failure and R is the Question. This way, the Failures don't have their own special "error flow" like exceptions do. They will get handled as any other data without using try/catch. 
 
 ### Libraries
+- Audioplayers: play the custom sfx
+- Dartz: Functional programming to dart
+- Get it: Simple service locator
+- Google Fonts: Fantastic google package to bring google fonts to flutter
+- Shared preferences: Save the user high score
 
 ## Flutter
 
 ### Custom painter
+With CustomPainter, Flutter gives you access to low-level graphics painting. I used this class to implement my custom game graphics (the divided parts circle).
+
+To implement a custom painter, you either subclass or implement this interface. CustomPaint subclasses must implement the paint and shouldRepaint methods, and may optionally also implement the hitTest and shouldRebuildSemantics methods, and the semanticsBuilder getter.
+
+The paint method is called whenever the custom object needs to be repainted.
+
+The shouldRepaint method is called when a new instance of the class is provided, to check if the new instance actually represents different information.
+
+The main difficulty here was to implement the hit test method since you can't draw stroke circles in a path. 
+
+I solved this problem by drawing 5 different arcs per semi-circle. 
+
+In the file `answer_circle_section_painter.dart` there are all the explanations.
 
 ### Animations
+
+I used the amazing animations library that flutter provides to animate the initial circle. 
+
+With the `AnimationController` you set all the animation constraints like the `Duration` and with the `AnimationBuilder` and the `Trasform.rotate()` widgets you build the view..
 
 ## Design
 

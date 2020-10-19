@@ -1,22 +1,48 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gioco/core/failures.dart';
 import 'package:gioco/game/data/questions_constants.dart';
 import 'package:gioco/game/data/questions_repository_impl.dart';
+import 'package:gioco/game/domain/model/question_domain_model.dart';
 import 'package:gioco/game/domain/repository/questions_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+void main() async {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  SharedPreferences.setMockInitialValues({});
+  final SharedPreferences sharedPreferences =
+      await SharedPreferences.getInstance();
   group('correct question generation', () {
     final QuestionsRepository questionsRepository = QuestionsRepositoryImpl(
-      sharedPreferences: null,
+      sharedPreferences: sharedPreferences,
     );
 
-    List questionRList = [];
+    List<Either<Failure, QuestionDomainModel>> questionRList = [];
 
     for (int i = 0; i < 100; i++) {
       questionRList.add(questionsRepository.getRandomQuestion(currentScore: 0));
     }
 
-    test('avoid duplicate colors in possible answers', () {});
+    test('avoid duplicate colors in possible answers', () {
+      bool foundDuplicates = false;
+
+      questionRList.forEach((element) {
+        List colors = [];
+        // check if elements are different
+        final question = element.getOrElse(() => null);
+
+        question.possibleAnswers.forEach((section) {
+          if (colors.contains(section.color)) {
+            foundDuplicates = true;
+          } else {
+            colors.add(section.color);
+          }
+        });
+      });
+
+      expect(foundDuplicates, false);
+    });
 
     test('correct answer is in possible answers', () {
       for (int i = 0; i < 100; i++) {
@@ -35,12 +61,28 @@ void main() {
       }
     });
 
-    test('high score is saved in the shared preferences', () {});
+    test('high score is saved in the shared preferences', () {
+      questionsRepository.getRandomQuestion(currentScore: 5);
+
+      expect(questionsRepository.getRecordPoints().getOrElse(() => null), 5);
+      questionsRepository.getRandomQuestion(currentScore: 2);
+
+      expect(questionsRepository.getRecordPoints().getOrElse(() => null), 5);
+
+      questionsRepository.getRandomQuestion(currentScore: 11);
+      expect(questionsRepository.getRecordPoints().getOrElse(() => null), 11);
+
+      questionsRepository.getRandomQuestion(currentScore: -1);
+      expect(questionsRepository.getRecordPoints().getOrElse(() => null), 11);
+
+      questionsRepository.getRandomQuestion(currentScore: null);
+      expect(questionsRepository.getRecordPoints().getOrElse(() => null), 11);
+    });
   });
 
   group('correct question difficulty', () {
     final questionsRepository = QuestionsRepositoryImpl(
-      sharedPreferences: null,
+      sharedPreferences: sharedPreferences,
     );
 
     bool checkEasyConditions(Tuple3 params) {

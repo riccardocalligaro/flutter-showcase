@@ -31,12 +31,17 @@ class WaveBackground extends StatelessWidget {
             Color(0xffe0aaff),
           ],
         ],
-        durations: [1, 2, 3],
+        // durations: [1, 2, 3],
         // durations: [
         //   32000,
         //   21000,
         //   30000,
         // ],
+        durations: [
+          32000,
+          21000,
+          18000,
+        ],
         heightPercentages: [0.03, 0.01, 0.02],
         gradientBegin: Alignment.bottomCenter,
         gradientEnd: Alignment.topCenter,

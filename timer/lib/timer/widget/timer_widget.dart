@@ -29,6 +29,7 @@ class TimerWidgetState extends State<TimerWidget> {
 
   StreamSubscription<DateTime> timeStreamSubscription;
 
+  // Tens digit and ones digit, decine e unità
   Tuple2 _minutesValues;
   Tuple2 _secondsValues;
 
@@ -44,7 +45,6 @@ class TimerWidgetState extends State<TimerWidget> {
     initStream = Stream<DateTime>.periodic(Duration(milliseconds: 1004), (_) {
       // we subtract one second every 'tick'
       timeLeft -= Duration(seconds: 1);
-
       // if there is no time left, we want to wait the last second
       // and then call on done
       if (timeLeft.inSeconds == 0) {
@@ -188,6 +188,12 @@ class TimerWidgetState extends State<TimerWidget> {
       fontSize: 52,
       fontWeight: FontWeight.bold,
     );
+  }
+
+  @override
+  void dispose() {
+    timeStreamSubscription.cancel();
+    super.dispose();
   }
 }
 

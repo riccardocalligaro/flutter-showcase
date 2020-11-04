@@ -6,6 +6,11 @@ All my assignments for the school year 2020-2021
 
 - gioco: color game, a simple game in which you have to tap on the right color in the given time
 
+<p align="center">
+  <img src="https://i.imgur.com/SLfHyQs.png" height="500px" alt="app screenshot">
+   <img src="https://i.imgur.com/15jsSg4.png" height="500px" alt="app screenshot">
+</p>
+
 - timer: A simple timer with a beautiful design.
 <p align="center">
   <img src="https://i.imgur.com/108QHOU.png" height="500px" alt="app screenshot">

@@ -1,5 +1,11 @@
 # Colors game
 
+
+<p align="center">
+  <img src="https://i.imgur.com/SLfHyQs.png" height="500px" alt="app screenshot">
+   <img src="https://i.imgur.com/15jsSg4.png" height="500px" alt="app screenshot">
+</p>
+
 ## Assignment
 
 Create a game in which a square changes color in a set range of 5 colors (at will), with each color change that takes place in a random time between 2 and 4 seconds. 

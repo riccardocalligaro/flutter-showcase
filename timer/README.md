@@ -2,9 +2,9 @@
 
 A simple timer with a beautiful design.
 
-<div style="width:100%; text-align:center;" >
-<img src="https://i.imgur.com/108QHOU.png" height="500px" alt="app screenshot">
-</div>
+<p align="center">
+  <img src="https://i.imgur.com/108QHOU.png" height="500px" alt="app screenshot">
+</p>
 
 ## Assignment
 

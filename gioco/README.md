@@ -1,7 +1,20 @@
 # Colors game
 
-Si realizzi un gioco in cui un quadrato cambia colore in un range prefissato di 5 colori (a piacere), ad ogni cambiamento di colore che avviene in un tempo random fra i 2 ed i 4 secondi 
-il giocatore deve fare click su uno dei cinque bottoni, posizionati opportunamente, dell'analogo colore.
+## Assignment
+
+Create a game in which a square changes color in a set range of 5 colors (at will), with each color change that takes place in a random time between 2 and 4 seconds. 
+The player must click on one of the five appropriately positioned buttons of the same color.
+
+## One thing before...
+
+This architecture and the file organizazion are totally overkill for a simple project, in 'real-life' you wouldn't wanna do something like this. But in this case I wanted to show the clean architecture that I've been using for a few months, it helped me a lot with big projects, maintenance can be a pain but if the code is organized and modular it's a lot more easier.
+
+I think that it is something that everyone should learn, with this architecutre a lot of principles come and they can make your developer-life a lot better.
+
+> “It is not enough for code to work.” -  Robert C. Martin, Uncle Bob
+
+Having said that, I will proceed to make the best explanation I can.
+
 
 ## Table of contents
 
@@ -118,5 +131,12 @@ I used the amazing animations library that flutter provides to animate the initi
 
 With the `AnimationController` you set all the animation constraints like the `Duration` and with the `AnimationBuilder` and the `Trasform.rotate()` widgets you build the view..
 
-## Design
 
+
+## More about clean architecture
+
+[Clean architecture](https://pusher.com/tutorials/clean-architecture-introduction)
+
+[A quick introduction to clean architecture ](https://www.freecodecamp.org/news/a-quick-introduction-to-clean-architecture-990c014448d2/)
+
+[The Principles of Clean Architecture by Uncle Bob Martin](https://youtu.be/o_TH-Y78tt4?t=642)

@@ -20,11 +20,11 @@ class QuestionsConstants {
   static const int EASY_ANSWERS = 4;
 
   static const int MEDIUM_POINTS = 2;
-  static const int MEDIUM_TIME_TO_ANSWER = 3000;
+  static const int MEDIUM_TIME_TO_ANSWER = 1500;
   static const int MEDIUM_ANSWERS = 6;
 
   static const int HARD_POINTS = 5;
-  static const int HARD_TIME_TO_ANSWER = 2000;
+  static const int HARD_TIME_TO_ANSWER = 1500;
   static const int HARD_ANSWERS = 8;
 
   static const int EXTREME_POINTS = 10;

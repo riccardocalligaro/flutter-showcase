@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
-import 'package:gioco/core/failures.dart';
-import 'package:gioco/core/usecase.dart';
+import 'package:gioco/core/domain/failures.dart';
+import 'package:gioco/core/domain/usecase.dart';
 import 'package:gioco/game/domain/repository/questions_repository.dart';
 
 class GetRecordPointsUseCase extends UseCase<int, NoParams> {

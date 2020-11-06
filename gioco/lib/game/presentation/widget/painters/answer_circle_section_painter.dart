@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:gioco/game/presentation/widget/section.dart';
 
+/// The custom painter for the circle divided in parts,
+/// this was not easy to implement since you have to also draw the touch path
 class AnswerCircleSectionCustomPainter extends CustomPainter {
   static const double CENTER_SPACE_RADIUS = 120.0;
 

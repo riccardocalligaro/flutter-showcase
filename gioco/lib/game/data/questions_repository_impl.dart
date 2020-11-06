@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
-import 'package:gioco/core/extension/g_colors.dart';
-import 'package:gioco/core/failures.dart';
+import 'package:gioco/core/presentation/g_colors.dart';
+import 'package:gioco/core/domain/failures.dart';
 import 'package:gioco/game/data/questions_constants.dart';
 import 'package:gioco/game/domain/model/question_domain_model.dart';
 import 'package:gioco/game/domain/repository/questions_repository.dart';
@@ -51,6 +51,7 @@ class QuestionsRepositoryImpl extends QuestionsRepository {
           )
           .toList();
 
+      // save the high score
       saveScore(currentScore);
 
       return Right(
@@ -66,10 +67,14 @@ class QuestionsRepositoryImpl extends QuestionsRepository {
     }
   }
 
-  void saveScore(int currentScore) async {
-    final max = sharedPreferences.getInt(QuestionsConstants.MAX_SCORE_KEY);
-    if (max == null || currentScore > max) {
-      sharedPreferences.setInt(QuestionsConstants.MAX_SCORE_KEY, currentScore);
+  @override
+  Either<Failure, int> getRecordPoints() {
+    try {
+      final score =
+          sharedPreferences.getInt(QuestionsConstants.MAX_SCORE_KEY) ?? 0;
+      return Right(score);
+    } catch (e) {
+      return Left(Failure(errorMessage: e.toString()));
     }
   }
 
@@ -107,14 +112,11 @@ class QuestionsRepositoryImpl extends QuestionsRepository {
     return Tuple3(points, timeToAnswer, answersToGenerate);
   }
 
-  @override
-  Either<Failure, int> getRecordPoints() {
-    try {
-      final score =
-          sharedPreferences.getInt(QuestionsConstants.MAX_SCORE_KEY) ?? 0;
-      return Right(score);
-    } catch (e) {
-      return Left(Failure(errorMessage: e.toString()));
+  /// Save the score to the [shared preferences]
+  void saveScore(int currentScore) async {
+    final max = sharedPreferences.getInt(QuestionsConstants.MAX_SCORE_KEY);
+    if (max == null || currentScore > max) {
+      sharedPreferences.setInt(QuestionsConstants.MAX_SCORE_KEY, currentScore);
     }
   }
 }

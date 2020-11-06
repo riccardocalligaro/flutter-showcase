@@ -5,6 +5,7 @@ import 'package:gioco/game/presentation/widget/painters/answer_circle_section_pa
 
 import '../section.dart';
 
+/// Animation in the start screen
 class StartGameAnimatedCircle extends StatefulWidget {
   final GetQuestionUseCase getQuestionUseCase;
   final VoidCallback startGame;

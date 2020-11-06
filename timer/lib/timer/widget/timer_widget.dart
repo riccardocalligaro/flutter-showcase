@@ -34,62 +34,6 @@ class TimerWidgetState extends State<TimerWidget> {
   Tuple2 _secondsValues;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  void _setupTimerStreams() {
-    var time = DateTime.now();
-
-    // since we can't use Timer.periodic() we use Stream.periodic(), this is the tick stream
-    initStream = Stream<DateTime>.periodic(Duration(milliseconds: 1004), (_) {
-      // we subtract one second every 'tick'
-      timeLeft -= Duration(seconds: 1);
-      // if there is no time left, we want to wait the last second
-      // and then call on done
-      if (timeLeft.inSeconds == 0) {
-        Future.delayed(Duration(milliseconds: 1000), () {
-          if (widget.onDone != null) {
-            timeStreamSubscription.cancel();
-            // reset all the values
-
-            setState(() {
-              initStream = null;
-              _minutesValues = null;
-              _secondsValues = null;
-            });
-            widget.onDone();
-          }
-        });
-      }
-
-      return time;
-    });
-
-    // assign the init stream to the timer stream
-    timeStream = initStream.take(timeLeft.inSeconds);
-
-    timeStreamSubscription = timeStream.listen((event) {
-      setValuesOnTick();
-    });
-  }
-
-  void setValuesOnTick() {
-    // seconds digit
-    final tensSecondsDigit = (timeLeft.inSeconds % 60) ~/ 10;
-    final onesSecondsDigit = (timeLeft.inSeconds % 60) % 10;
-
-    // minutes digit
-    final tensMinutesDigit = (timeLeft.inMinutes % 60) ~/ 10;
-    final onesMinutesDigit = (timeLeft.inMinutes % 60) % 10;
-
-    setState(() {
-      _secondsValues = Tuple2(tensSecondsDigit, onesSecondsDigit);
-      _minutesValues = Tuple2(tensMinutesDigit, onesMinutesDigit);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Center(
       key: timerWidgetKey,
@@ -128,6 +72,7 @@ class TimerWidgetState extends State<TimerWidget> {
     ];
   }
 
+  /// Draws the digits [values.value1values.value2]
   Widget _buildDigit({
     @required Tuple2 values,
   }) {
@@ -137,10 +82,73 @@ class TimerWidgetState extends State<TimerWidget> {
     );
   }
 
+  /// Style for the timer digits
+  TextStyle get digitStyle {
+    return TextStyle(
+      color: Colors.white,
+      fontSize: 52,
+      fontWeight: FontWeight.bold,
+    );
+  }
+
+  /// Sets up the timer streams for the timer to work
+  void _setupTimerStreams() {
+    var time = DateTime.now();
+
+    // since we can't use Timer.periodic() we use Stream.periodic(), this is the tick stream
+    initStream = Stream<DateTime>.periodic(Duration(milliseconds: 1004), (_) {
+      // we subtract one second every 'tick'
+      timeLeft -= Duration(seconds: 1);
+      // if there is no time left, we want to wait the last second
+      // and then call on done
+      if (timeLeft.inSeconds == 0) {
+        Future.delayed(Duration(milliseconds: 1000), () {
+          if (widget.onDone != null) {
+            timeStreamSubscription.cancel();
+
+            // reset all the values
+            setState(() {
+              initStream = null;
+              _minutesValues = null;
+              _secondsValues = null;
+            });
+            widget.onDone();
+          }
+        });
+      }
+
+      return time;
+    });
+
+    // assign the init stream to the timer stream
+    timeStream = initStream.take(timeLeft.inSeconds);
+
+    timeStreamSubscription = timeStream.listen((event) {
+      setValuesOnTick();
+    });
+  }
+
+  /// Every [1 second] updates the values
+  void setValuesOnTick() {
+    // seconds digit
+    final tensSecondsDigit = (timeLeft.inSeconds % 60) ~/ 10;
+    final onesSecondsDigit = (timeLeft.inSeconds % 60) % 10;
+
+    // minutes digit
+    final tensMinutesDigit = (timeLeft.inMinutes % 60) ~/ 10;
+    final onesMinutesDigit = (timeLeft.inMinutes % 60) % 10;
+
+    setState(() {
+      _secondsValues = Tuple2(tensSecondsDigit, onesSecondsDigit);
+      _minutesValues = Tuple2(tensMinutesDigit, onesMinutesDigit);
+    });
+  }
+
+  /// Cancels the subscription and resets everything
   void resetTimer() {
     timeStreamSubscription.cancel();
-    // reset all the values
 
+    // reset all the values
     setState(() {
       initStream = null;
       _minutesValues = null;
@@ -182,22 +190,10 @@ class TimerWidgetState extends State<TimerWidget> {
     }
   }
 
-  TextStyle get digitStyle {
-    return TextStyle(
-      color: Colors.white,
-      fontSize: 52,
-      fontWeight: FontWeight.bold,
-    );
-  }
-
   @override
   void dispose() {
+    // always remember to cancel the subscription
     timeStreamSubscription.cancel();
     super.dispose();
   }
-}
-
-class DurationInvalidData implements Exception {
-  String cause;
-  DurationInvalidData(this.cause);
 }

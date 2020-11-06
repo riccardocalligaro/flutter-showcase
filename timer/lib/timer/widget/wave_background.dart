@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wave/wave.dart';
 import 'package:wave/config.dart';
 
+/// The stack backround
 class WaveBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,6 @@ class WaveBackground extends StatelessWidget {
             Color(0xff3C096C).withOpacity(0.8),
           ],
           [
-            // purple color palette
             Color(0xff10002b),
             Color(0xff240046),
             Color(0xff3c096c),
@@ -31,12 +31,6 @@ class WaveBackground extends StatelessWidget {
             Color(0xffe0aaff),
           ],
         ],
-        // durations: [1, 2, 3],
-        // durations: [
-        //   32000,
-        //   21000,
-        //   30000,
-        // ],
         durations: [
           32000,
           21000,

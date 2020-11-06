@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gioco/core/failures.dart';
-import 'package:gioco/core/usecase.dart';
+import 'package:gioco/core/domain/failures.dart';
+import 'package:gioco/core/domain/usecase.dart';
 
 void main() {
   group('correct usecase functioning', () {

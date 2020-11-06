@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gioco/core/extension/g_colors.dart';
+import 'package:gioco/core/presentation/g_colors.dart';
 import 'package:gioco/game/game_container.dart';
 import 'package:gioco/game/presentation/game_page.dart';
 

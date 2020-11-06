@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:gioco/core/failures.dart';
+import 'package:gioco/core/domain/failures.dart';
 import 'package:gioco/game/domain/model/question_domain_model.dart';
 import 'package:gioco/game/domain/usecase/get_question_usecase.dart';
 import 'package:gioco/game/presentation/widget/painters/answer_circle_section_painter.dart';

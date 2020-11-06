@@ -31,6 +31,25 @@ class QuestionDomainModel {
             points != null);
 
   @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is QuestionDomainModel &&
+        o.generatedColor == generatedColor &&
+        listEquals(o.possibleAnswers, possibleAnswers) &&
+        o.timeToAnswer == timeToAnswer &&
+        o.points == points;
+  }
+
+  @override
+  int get hashCode {
+    return generatedColor.hashCode ^
+        possibleAnswers.hashCode ^
+        timeToAnswer.hashCode ^
+        points.hashCode;
+  }
+
+  @override
   String toString() {
     return 'QuestionDomainModel(generatedColor: $generatedColor, possibleAnswers: $possibleAnswers, timeToAnswer: $timeToAnswer, points: $points)';
   }

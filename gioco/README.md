@@ -13,9 +13,9 @@ The player must click on one of the five appropriately positioned buttons of the
 
 ## One thing before...
 
-This architecture and the file organizazion are totally overkill for a simple project, in 'real-life' you wouldn't wanna do something like this. But in this case I wanted to show the clean architecture that I've been using for a few months, it helped me a lot with big projects, maintenance can be a pain but if the code is organized and modular it's a lot more easier.
+This architecture is totally overkill for a simple project, in 'real-life' you wouldn't want to do something like this. But in this case I wanted to show the clean architecture that I've been using for a few months, it helped me a lot with big projects, maintenance can be a pain but if the code is organized and modular it's a lot more easier.
 
-I think that it is something that everyone should learn, with this architecutre a lot of principles come and they can make your developer-life a lot better.
+I think that it is something that everyone should learn, with this a lot of principles come and they can make your developer-life a lot better.
 
 > “It is not enough for code to work.” -  Robert C. Martin, Uncle Bob
 
@@ -45,6 +45,41 @@ Having said that, I will proceed to make the best explanation I can.
 ![The project structure](https://i0.wp.com/resocoder.com/wp-content/uploads/2019/08/Clean-Architecture-Flutter-Diagram.png?ssl=1)
 
 In my case there were no remote or local data sources, the call flows ends at the repository, the layer in which the questions are generated.
+
+- `main.dart` Entry point for the application
+- `core/` folder that contains all the core features
+    - `domain`/
+        - `failures.dart`, Failure object, used for functional programming
+        - `usecase.dart`, UseCase entity, will explain this later
+    - `presentation`/
+        - `g_colors.dart`, game main colors and utilities
+- `game/` game folder
+    - `game_container.dart`, files that contains a static method will all the dependency to initialize with GetIt
+    - `data/`
+        - `question_constants.dart`, constants with different difficulties ect
+        - `questions_repository_impl.dart`, the implementation of the `QuestionsRepository`, contains the method that retrieves the random question
+    - `domain/`
+        - `model/`, app models
+            - `question_domain_model.dart`, the `Question` class model
+        - `repository`, abstract classes
+            - `questions_repository.dart`, abstract class, this is implemented in `questions_repository_impl.dart`
+        - `usecase`, use cases for our application
+            - `get_question_usecase.dart`, gets a random question
+            - `get_record_points_usecase.dart`, gets the high scroe
+    - `presentation/`
+        - `game_page.dart`, 'entry point' for our application, this is the first 'widget', controls whether to show the start or the question screen
+        - `start_game_page.dart`, first page, shows the user high score and a button to press for starting the game
+        - `question_page.dart`, the actual game
+        - `widget/`, other ui elements
+            - `animations/`
+                - `start_game_animation.dart`, the animation in the start page
+            - `painters/`, painters for the custom circle
+                - `answer_circle_section_painter.dart`, the custom painter
+            - `section.dart`, the part of the circle, its used to rapresent an answer
+            
+
+
+
 
 ### Clean architecture
 
@@ -108,15 +143,16 @@ The dartz package, which I've added as a dependency, brings functional programmi
 This type can be used to represent any two types at the same time and it's just perfect for error handling, where L is the Failure and R is the Question. This way, the Failures don't have their own special "error flow" like exceptions do. They will get handled as any other data without using try/catch. 
 
 ### Libraries
-- Audioplayers: play the custom sfx
-- Dartz: Functional programming to dart
-- Get it: Simple service locator
-- Google Fonts: Fantastic google package to bring google fonts to flutter
-- Shared preferences: Save the user high score
+- `Audioplayers`: play the custom sfx
+- `Dartz`: Functional programming to dart
+- `Get it`: Simple service locator
+- `Google Fonts`: Fantastic google package to bring google fonts to flutter
+- `Shared preferences`: Save the user high score
 
 ## Flutter
 
 ### Custom painter
+
 With CustomPainter, Flutter gives you access to low-level graphics painting. I used this class to implement my custom game graphics (the divided parts circle).
 
 To implement a custom painter, you either subclass or implement this interface. CustomPaint subclasses must implement the paint and shouldRepaint methods, and may optionally also implement the hitTest and shouldRebuildSemantics methods, and the semanticsBuilder getter.
@@ -139,7 +175,7 @@ With the `AnimationController` you set all the animation constraints like the `D
 
 
 
-## More about clean architecture
+### More about clean architecture
 
 [Clean architecture](https://pusher.com/tutorials/clean-architecture-introduction)
 

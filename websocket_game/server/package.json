@@ -1,0 +1,17 @@
+{
+  "name": "websocket_server",
+  "version": "1.0.0",
+  "description": "Simple websocket server for a kahoot clone",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^2.3.0",
+    "ws": "^7.4.0"
+  }
+}

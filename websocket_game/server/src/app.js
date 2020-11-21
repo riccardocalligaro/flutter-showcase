@@ -5,11 +5,12 @@ io.set('origins', '*:*');
 
 const https = require('https');
 const timers = require('timers');
+var decode = require('unescape');
 
 var questionRequest = {
     host: 'opentdb.com',
     port: 443,
-    path: '/api.php?amount=25&type=multiple&encode=urlLegacy',
+    path: '/api.php?amount=25&type=multiple',
     method: 'GET'
 };
 
@@ -36,15 +37,19 @@ pullQuestion().then((question) => {
 
 // Set up a timer to push a question every x seconds
 timers.setInterval(function () {
-    cosole.log('Pulling new question...');
+    console.log('Pulling new question...');
 
     pullQuestion().then((question) => {
         currentQuestion = question;
-        cosole.log('Sending new question...');
+
+        console.log("got question" + question);
+
+        console.log('Sending new question...');
         io.emit('question', JSON.stringify(currentQuestion));
+        io.emit('currentPlayers', JSON.stringify(currentPlayers));
     });
 
-}, questionTime * 10000);
+}, questionTime * 1000);
 
 
 
@@ -62,7 +67,9 @@ io.on('connection', function (socket) {
 
     // Send the current question to the user when they connect.
     socket.emit('initPlayId', playId);
+
     socket.emit('question', JSON.stringify(currentQuestion));
+    console.log(currentPlayers);
     socket.emit('currentPlayers', JSON.stringify(currentPlayers));
 
     // Set up the nickname when it comes in.

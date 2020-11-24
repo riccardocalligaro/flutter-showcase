@@ -15,3 +15,20 @@ All my assignments for the school year 2020-2021
 <p align="center">
   <img src="https://i.imgur.com/108QHOU.png" height="500px" alt="app screenshot">
 </p>
+
+
+- tcp_chat: a simple tcp chat with a nodejs backend
+
+<p align="center">
+  <img src="https://i.imgur.com/dGXbLUk.png" height="500px" alt="app screenshot">
+   <img src="https://i.imgur.com/yjBM0Xn.png" height="500px" alt="app screenshot">
+</p>
+
+
+- websocket_game: a multiplayer quiz game with a flutter client and a nodejs backend that uses websocket
+
+<p align="center">
+  <img src="https://i.imgur.com/6qVCIp2.png" height="500px" alt="app screenshot">
+   <img src="https://i.imgur.com/e5jmTi2.png" height="500px" alt="app screenshot">
+</p>
+

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:undraw/illustrations.dart';
@@ -33,9 +35,11 @@ class _HomePageState extends State<HomePage>
 
   Map<String, Color> _answerColors = Map();
 
-  double _percentValue = 0.0;
+  double _percentValue = 1.0;
 
   AnimationController _controller;
+
+  Timer _questionTimer;
 
   @override
   void initState() {
@@ -98,7 +102,7 @@ class _HomePageState extends State<HomePage>
       width: MediaQuery.of(context).size.width,
       child: NeumorphicProgress(
         percent: _percentValue,
-        duration: Duration(seconds: 5),
+        duration: Duration(seconds: 1),
         height: 25,
         style: ProgressStyle(
           variant: Colors.purple,
@@ -142,7 +146,7 @@ class _HomePageState extends State<HomePage>
             color: _answerColors[answer],
           ),
           child: Text(
-            answer,
+            Uri.decodeFull(answer),
             style: TextStyle(
               fontSize: 16,
               color: _answerColors[answer] != null ? Colors.white : null,
@@ -161,6 +165,7 @@ class _HomePageState extends State<HomePage>
               } else {
                 setState(() {
                   _answerColors[answer] = Colors.red;
+                  _answerColors[_currentQuestion.correctAnswer] = Colors.green;
                 });
               }
             }
@@ -196,27 +201,30 @@ class _HomePageState extends State<HomePage>
             color = null;
           }
 
-          return Container(
-            height: 40,
-            width: size,
-            child: Neumorphic(
-              style: NeumorphicStyle(
-                shape: NeumorphicShape.concave,
-                boxShape:
-                    NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
-                depth: 50,
-                color: color,
-                shadowLightColorEmboss: Colors.orange,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    '${player.nickname} - ${player.score}',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Container(
+              height: 40,
+              width: size,
+              child: Neumorphic(
+                style: NeumorphicStyle(
+                  shape: NeumorphicShape.concave,
+                  boxShape:
+                      NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
+                  depth: 50,
+                  color: color,
+                  shadowLightColorEmboss: Colors.orange,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '${player.nickname} - ${player.score}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -230,6 +238,10 @@ class _HomePageState extends State<HomePage>
 
   void setupQuestionCallback() {
     widget.quizSocketManager.onQuestion((value) {
+      if (_questionTimer != null) {
+        _questionTimer.cancel();
+        _percentValue = 1.0;
+      }
       setState(() {
         _currentQuestion = value;
         final allAnswers = _currentQuestion.incorrectAnswers;
@@ -238,6 +250,15 @@ class _HomePageState extends State<HomePage>
         _answerColors.clear();
         setState(() {
           _answers = allAnswers;
+          _questionTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+            setState(() {
+              if (_percentValue >= 0.2) {
+                _percentValue = _percentValue - 0.1;
+              } else {
+                _percentValue = 0.0;
+              }
+            });
+          });
         });
       });
     });

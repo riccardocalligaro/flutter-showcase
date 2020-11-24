@@ -13,12 +13,11 @@ class WebsocketGame extends StatefulWidget {
 }
 
 class _WebsocketGameState extends State<WebsocketGame> {
-  IO.Socket socket;
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Websocket game',
+      debugShowCheckedModeBanner: false,
+      title: 'Websocket Game',
       themeMode: ThemeMode.light,
       theme: ThemeData(
         fontFamily: 'Nunito',
@@ -26,11 +25,5 @@ class _WebsocketGameState extends State<WebsocketGame> {
       ),
       home: StartPage(),
     );
-  }
-
-  @override
-  void dispose() {
-    socket.disconnect();
-    super.dispose();
   }
 }

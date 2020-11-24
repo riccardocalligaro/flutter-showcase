@@ -10,7 +10,7 @@ var decode = require('unescape');
 var questionRequest = {
     host: 'opentdb.com',
     port: 443,
-    path: '/api.php?amount=25&type=multiple',
+    path: '/api.php?amount=25&type=multiple&encode=url3986&category=18&difficulty=easy',
     method: 'GET'
 };
 
@@ -49,7 +49,7 @@ timers.setInterval(function () {
         io.emit('currentPlayers', JSON.stringify(currentPlayers));
     });
 
-}, questionTime * 1000);
+}, 11000);
 
 
 
@@ -76,6 +76,7 @@ io.on('connection', function (socket) {
     socket.on('sendMessage', function (newMessage) {
         console.log(newMessage);
         messages.push(newMessage);
+        console.log('Emitting new message');
         socket.emit('newMessage', newMessage);
     });
 

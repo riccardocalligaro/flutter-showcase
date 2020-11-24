@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -13,7 +14,9 @@ class QuizSocketManager {
   IO.Socket socket;
 
   void connect() {
-    socket = IO.io('http://localhost:3000', <String, dynamic>{
+    final url =
+        Platform.isAndroid ? 'http://10.0.2.2:3000' : 'http://localhost:3000';
+    socket = IO.io(url, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
@@ -67,6 +70,8 @@ class QuizSocketManager {
     return socket.on(
       'newMessage',
       (data) {
+        print('Got new message');
+
         final Map<String, dynamic> decoded = json.decode(data);
 
         final message = MessageRemoteModel.fromJson(decoded);

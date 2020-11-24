@@ -23,8 +23,10 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
 
-    widget.quizSocketManager
-        .onNewMessage((message) => setState(() => _messages.add(message)));
+    widget.quizSocketManager.onNewMessage((message) {
+      print('Got new message $message');
+      setState(() => _messages.add(message));
+    });
   }
 
   @override

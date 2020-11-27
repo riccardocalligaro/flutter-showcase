@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:websocket_game/presentation/start/start_page.dart';
 
 void main() {

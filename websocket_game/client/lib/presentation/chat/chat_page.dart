@@ -62,7 +62,7 @@ class _ChatPageState extends State<ChatPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'me'.toUpperCase(),
+                            isCurrentUser ? 'ME' : message.nickname,
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.black.withOpacity(0.5),

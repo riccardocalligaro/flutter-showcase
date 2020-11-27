@@ -16,6 +16,10 @@ class QuizSocketManager {
   void connect() {
     final url =
         Platform.isAndroid ? 'http://10.0.2.2:3000' : 'http://localhost:3000';
+
+    // set the ngrok url
+    // final url = 'http://d1b4af41b5c8.eu.ngrok.io';
+
     socket = IO.io(url, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,

@@ -77,7 +77,11 @@ io.on('connection', function (socket) {
         console.log(newMessage);
         messages.push(newMessage);
         console.log('Emitting new message');
+        
+        // send it back to the original sender
         socket.emit('newMessage', newMessage);
+        // emit the message to all the users
+        socket.broadcast.emit('newMessage', newMessage);
     });
 
     // Set up the nickname when it comes in.

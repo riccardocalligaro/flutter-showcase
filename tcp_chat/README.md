@@ -5,7 +5,7 @@
 
 <p align="center">
   <img src="https://i.imgur.com/dGXbLUk.png" height="500px" alt="app screenshot">
-   <img src="https://i.imgur.com/dd4fZI0.png" height="500px" alt="app screenshot">
+   <img src="https://i.imgur.com/yjBM0Xn.png" height="500px" alt="app screenshot">
 </p>
 
 

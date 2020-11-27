@@ -6,12 +6,9 @@ void main() {
   runApp(WebsocketGame());
 }
 
-class WebsocketGame extends StatefulWidget {
-  @override
-  _WebsocketGameState createState() => _WebsocketGameState();
-}
+class WebsocketGame extends StatelessWidget {
+  const WebsocketGame({Key key}) : super(key: key);
 
-class _WebsocketGameState extends State<WebsocketGame> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

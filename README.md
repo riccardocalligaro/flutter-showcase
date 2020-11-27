@@ -29,6 +29,6 @@ All my assignments for the school year 2020-2021
 
 <p align="center">
   <img src="https://i.imgur.com/6qVCIp2.png" height="500px" alt="app screenshot">
-   <img src="https://i.imgur.com/e5jmTi2.png" height="500px" alt="app screenshot">
+   <img src="https://i.imgur.com/dd4fZI0.png" height="500px" alt="app screenshot">
 </p>
 

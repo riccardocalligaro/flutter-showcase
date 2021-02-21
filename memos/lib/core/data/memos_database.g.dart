@@ -116,6 +116,21 @@ class _$MemosLocalDatasource extends MemosLocalDatasource {
                   'remind_at': _dateTimeConverter.encode(item.remindAt)
                 },
             changeListener),
+        _tagLocalModelInsertionAdapter = InsertionAdapter(
+            database,
+            'tags',
+            (TagLocalModel item) =>
+                <String, dynamic>{'id': item.id, 'title': item.title},
+            changeListener),
+        _memosTagsInsertionAdapter = InsertionAdapter(
+            database,
+            'memos_tags',
+            (MemosTags item) => <String, dynamic>{
+                  'id': item.id,
+                  'memo_id': item.memoId,
+                  'tag_id': item.tagId
+                },
+            changeListener),
         _memoLocalModelUpdateAdapter = UpdateAdapter(
             database,
             'memos',
@@ -139,6 +154,10 @@ class _$MemosLocalDatasource extends MemosLocalDatasource {
   final QueryAdapter _queryAdapter;
 
   final InsertionAdapter<MemoLocalModel> _memoLocalModelInsertionAdapter;
+
+  final InsertionAdapter<TagLocalModel> _tagLocalModelInsertionAdapter;
+
+  final InsertionAdapter<MemosTags> _memosTagsInsertionAdapter;
 
   final UpdateAdapter<MemoLocalModel> _memoLocalModelUpdateAdapter;
 
@@ -195,6 +214,18 @@ class _$MemosLocalDatasource extends MemosLocalDatasource {
   Future<void> insertMemo(MemoLocalModel memoLocalModel) async {
     await _memoLocalModelInsertionAdapter.insert(
         memoLocalModel, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> insertTags(List<TagLocalModel> tags) async {
+    await _tagLocalModelInsertionAdapter.insertList(
+        tags, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> insertMemoTags(List<MemosTags> memosTags) async {
+    await _memosTagsInsertionAdapter.insertList(
+        memosTags, OnConflictStrategy.abort);
   }
 
   @override

@@ -20,4 +20,10 @@ abstract class MemosLocalDatasource {
 
   @insert
   Future<void> insertMemo(MemoLocalModel memoLocalModel);
+
+  @insert
+  Future<void> insertTags(List<TagLocalModel> tags);
+
+  @insert
+  Future<void> insertMemoTags(List<MemosTags> memosTags);
 }

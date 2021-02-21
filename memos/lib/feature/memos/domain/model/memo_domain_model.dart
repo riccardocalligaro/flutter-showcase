@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memos/feature/memos/data/model/memo_local_model.dart';
 
 class MemosPageData {
   List<MemoDomainModel> memos;
@@ -19,6 +20,7 @@ class MemoDomainModel {
   DateTime createdAt;
   DateTime remindAt;
   List<TagDomainModel> tags;
+  String creator;
 
   MemoDomainModel({
     @required this.id,
@@ -29,10 +31,24 @@ class MemoDomainModel {
     @required this.createdAt,
     @required this.remindAt,
     @required this.tags,
+    @required this.creator,
   });
+
+  MemoLocalModel toLocalModel() {
+    return MemoLocalModel(
+      id: id,
+      title: title,
+      content: content,
+      color: 'ffff',
+      state: state.toString(),
+      createdAt: createdAt,
+      remindAt: remindAt,
+      creator: creator,
+    );
+  }
 }
 
-enum MemoState { deleted, archived, pinned, unspecified, shared }
+enum MemoState { deleted, archived, pinned, all, shared }
 
 class TagDomainModel {
   final String id;
@@ -42,4 +58,11 @@ class TagDomainModel {
     @required this.id,
     @required this.title,
   });
+
+  TagLocalModel toLocalModel() {
+    return TagLocalModel(
+      id: id,
+      title: title,
+    );
+  }
 }

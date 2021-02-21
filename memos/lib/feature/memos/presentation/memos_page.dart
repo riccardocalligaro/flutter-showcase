@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:memos/feature/login/model/current_user.dart';
+import 'package:memos/feature/memos/domain/model/memo_domain_model.dart';
+import 'package:memos/feature/memos/presentation/add_memo_page.dart';
 import 'package:memos/feature/memos/presentation/bloc/memos/memos_watcher_bloc.dart';
 import 'package:provider/provider.dart';
 
@@ -22,11 +24,16 @@ class _NotesScreenState extends State<NotesScreen>
     super.initState();
 
     _tabController = TabController(initialIndex: 0, length: 4, vsync: this);
+
+    // _tabController.addListener(() {
+    //   print(_tabController.index);
+    // });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: _fab(),
       body: ListView(
         children: <Widget>[
           const SizedBox(
@@ -100,13 +107,22 @@ class _NotesScreenState extends State<NotesScreen>
                         ],
                       ),
                     ),
-                    SizedBox(height: 16.0),
+                    const SizedBox(height: 16.0),
                     ListView.builder(
                       shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
                       itemCount: state.memosPageData.memos.length,
                       itemBuilder: (context, index) {
-                        return _MemoCard();
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: _MemoCard(
+                            memo: state.memosPageData.memos[index],
+                          ),
+                        );
                       },
+                    ),
+                    const SizedBox(
+                      height: 64,
                     ),
                   ],
                 );
@@ -116,6 +132,19 @@ class _NotesScreenState extends State<NotesScreen>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _fab() {
+    return FloatingActionButton(
+      child: Icon(Icons.add),
+      onPressed: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => AddMemoPage(),
+          ),
+        );
+      },
     );
   }
 
@@ -223,7 +252,12 @@ class _TopAppBar extends StatelessWidget {
 }
 
 class _MemoCard extends StatelessWidget {
-  const _MemoCard({Key key}) : super(key: key);
+  final MemoDomainModel memo;
+
+  const _MemoCard({
+    Key key,
+    @required this.memo,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -231,8 +265,8 @@ class _MemoCard extends StatelessWidget {
     final DateFormat _timeFormatter = DateFormat('h:mm');
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 30.0),
-      padding: EdgeInsets.all(30.0),
+      margin: const EdgeInsets.symmetric(horizontal: 30.0),
+      padding: const EdgeInsets.all(30.0),
       decoration: BoxDecoration(
         color: Color(0xFFF5F7FB),
         borderRadius: BorderRadius.circular(30.0),
@@ -242,55 +276,39 @@ class _MemoCard extends StatelessWidget {
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Text(
-                'notes[0].title',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Text(
-                _timeFormatter.format(DateTime.now()),
-                style: TextStyle(
-                  color: Color(0xFFAFB4C6),
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 15.0),
-          Text(
-            'notes[0].content',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 18.0,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              Text(
-                _dateFormatter.format(DateTime.now()),
-                style: TextStyle(
-                  color: Color(0xFFAFB4C6),
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w500,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    memo.title,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  Text(
+                    _dateFormatter.format(memo.createdAt),
+                    style: TextStyle(
+                      color: Color(0xFFAFB4C6),
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
               Container(
                 height: 50.0,
                 width: 50.0,
                 decoration: BoxDecoration(
-                  color: Color(0xFF417BFB),
+                  color: Theme.of(context).primaryColor,
                   borderRadius: BorderRadius.circular(15.0),
                 ),
-                child: Icon(
-                  Icons.location_on,
+                child: const Icon(
+                  Icons.share,
                   color: Colors.white,
                 ),
               ),

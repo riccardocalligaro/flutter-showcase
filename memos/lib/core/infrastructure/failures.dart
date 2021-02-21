@@ -12,3 +12,5 @@ class Failure {
     return 'Errore generico';
   }
 }
+
+class Success {}

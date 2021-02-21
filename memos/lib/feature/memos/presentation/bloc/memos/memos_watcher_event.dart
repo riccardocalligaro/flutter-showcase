@@ -10,3 +10,11 @@ class MemosDataReceived extends MemosWatcherEvent {
     @required this.resource,
   });
 }
+
+class FilterMemos extends MemosWatcherEvent {
+  final MemoState filter;
+
+  FilterMemos({
+    @required this.filter,
+  });
+}

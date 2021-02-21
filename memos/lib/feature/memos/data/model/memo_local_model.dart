@@ -43,6 +43,7 @@ class MemoLocalModel {
       createdAt: createdAt,
       remindAt: remindAt,
       tags: tags,
+      creator: creator,
     );
   }
 

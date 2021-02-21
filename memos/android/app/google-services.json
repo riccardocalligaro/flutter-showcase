@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "532680615230",
+    "project_id": "memos-8f3cd",
+    "storage_bucket": "memos-8f3cd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:532680615230:android:57dde3e71a2e4d88a9b86f",
+        "android_client_info": {
+          "package_name": "com.riccardocalligaro.memos"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "532680615230-ifmm311ivhf9uuopovmbv7q7a031qval.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.riccardocalligaro.memos",
+            "certificate_hash": "6d8ea57438d0321676466e8b03190e697433394e"
+          }
+        },
+        {
+          "client_id": "532680615230-p8kh7sjalf8pg3poqefsg4tr14qb96p2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgSe1j7iI8-8gnnvXH8ZYQ9S0z5xIqf5M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "532680615230-p8kh7sjalf8pg3poqefsg4tr14qb96p2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "532680615230-m00p5sjp15u367dok9o1u5qbmg2k63qu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.riccardocalligaro.memos"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

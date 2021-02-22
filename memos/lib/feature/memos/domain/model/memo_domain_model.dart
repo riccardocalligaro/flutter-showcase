@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:memos/feature/memos/data/model/memo_local_model.dart';
 
 class MemosPageData {
@@ -48,15 +49,17 @@ class MemoDomainModel {
   }
 }
 
-enum MemoState { deleted, archived, pinned, all, shared }
+enum MemoState { all, shared, archived, pinned }
 
 class TagDomainModel {
   final String id;
   String title;
+  int count;
 
   TagDomainModel({
     @required this.id,
     @required this.title,
+    @required this.count,
   });
 
   TagLocalModel toLocalModel() {
@@ -65,4 +68,7 @@ class TagDomainModel {
       title: title,
     );
   }
+
+  @override
+  String toString() => 'TagDomainModel(id: $id, title: $title)';
 }

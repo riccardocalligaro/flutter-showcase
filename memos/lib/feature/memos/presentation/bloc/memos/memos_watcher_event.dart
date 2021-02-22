@@ -13,8 +13,10 @@ class MemosDataReceived extends MemosWatcherEvent {
 
 class FilterMemos extends MemosWatcherEvent {
   final MemoState filter;
+  final TagDomainModel tag;
 
   FilterMemos({
-    @required this.filter,
+    this.filter,
+    this.tag,
   });
 }

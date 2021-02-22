@@ -17,4 +17,10 @@ part 'memos_database.g.dart';
 ])
 abstract class MemosDatabase extends FloorDatabase {
   MemosLocalDatasource get memosLocalDatasource;
+
+  Future<void> clearAllTables() async {
+    await database.execute('DELETE FROM memos_tags');
+    await database.execute('DELETE FROM tags');
+    await database.execute('DELETE FROM memos');
+  }
 }

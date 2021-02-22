@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_tags/flutter_tags.dart';
 import 'package:memos/core/core_container.dart';
 import 'package:memos/feature/login/model/current_user.dart';
 import 'package:memos/feature/memos/domain/model/memo_domain_model.dart';
 import 'package:memos/feature/memos/domain/repository/memos_repository.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
+
+import 'bloc/memos/memos_watcher_bloc.dart';
+
+final GlobalKey<TagsState> _tagStateKey = GlobalKey<TagsState>();
 
 class AddMemoPage extends StatefulWidget {
   const AddMemoPage({Key key}) : super(key: key);
@@ -17,16 +22,37 @@ class AddMemoPage extends StatefulWidget {
 class _AddMemoPageState extends State<AddMemoPage> {
   TextEditingController _titleEditingController = TextEditingController();
   TextEditingController _contentEditingController = TextEditingController();
+  List<TagDomainModel> _items = [];
+
+  @override
+  void initState() {
+    final state = BlocProvider.of<MemosWatcherBloc>(context).state;
+
+    if (state is MemosWatcherLoadSuccess) {
+      setState(() {
+        _items = state.memosPageData.tags;
+      });
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: _fab(),
       appBar: AppBar(
-        title: Text('Add note'),
+        title: Text('Add memo'),
       ),
-      body: _buildNoteDetail(),
-      // bottomNavigationBar: _buildBottomAppBar(context),
+      body: BlocListener<MemosWatcherBloc, MemosWatcherState>(
+        listener: (context, state) {
+          if (state is MemosWatcherLoadSuccess) {
+            setState(() {
+              _items = state.memosPageData.tags;
+            });
+          }
+        },
+        child: _buildNoteDetail(),
+      ),
     );
   }
 
@@ -42,7 +68,7 @@ class _AddMemoPageState extends State<AddMemoPage> {
           state: MemoState.all,
           createdAt: DateTime.now(),
           remindAt: DateTime.now().add(Duration(days: 1)),
-          tags: [],
+          tags: _items,
           creator: Provider.of<CurrentUser>(context, listen: false).data.email,
         );
 
@@ -57,6 +83,56 @@ class _AddMemoPageState extends State<AddMemoPage> {
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: <Widget>[
+        Tags(
+          alignment: WrapAlignment.start,
+          runAlignment: WrapAlignment.start,
+          horizontalScroll: true,
+          key: _tagStateKey,
+
+          textField: TagsTextField(
+            // constraintSugd,
+            autofocus: false,
+            onSubmitted: (String str) {
+              // Add item to the data source.
+              setState(() {
+                _items.add(TagDomainModel(
+                  id: '',
+                  title: str,
+                  count: null,
+                ));
+              });
+            },
+          ),
+          itemCount: _items.length, // required
+          itemBuilder: (int index) {
+            final item = _items[index];
+
+            return ItemTags(
+              key: Key(index.toString()),
+              activeColor: Theme.of(context).primaryColor,
+              index: index, // required
+              title: item.title,
+              // removeButton: null,
+              pressEnabled: false,
+              removeButton: ItemTagsRemoveButton(
+                onRemoved: () {
+                  // Remove the item from the data source.
+                  setState(() {
+                    // required
+                    _items.removeAt(index);
+                  });
+                  //required
+                  return true;
+                },
+              ),
+              // onPressed: (item) => print(item),
+              // onLongPressed: (item) => print(item),
+            );
+          },
+        ),
+        const SizedBox(
+          height: 12,
+        ),
         TextField(
           controller: _titleEditingController,
           // style: kNoteTitleLight,
@@ -74,7 +150,9 @@ class _AddMemoPageState extends State<AddMemoPage> {
           maxLength: 1024,
           textCapitalization: TextCapitalization.sentences,
         ),
-        const SizedBox(height: 14),
+        const SizedBox(
+          height: 8,
+        ),
         TextField(
           controller: _contentEditingController,
           decoration: InputDecoration(
@@ -94,6 +172,9 @@ class _AddMemoPageState extends State<AddMemoPage> {
           maxLines: 20,
           textCapitalization: TextCapitalization.sentences,
         ),
+        const SizedBox(
+          height: 64,
+        )
       ],
     );
   }

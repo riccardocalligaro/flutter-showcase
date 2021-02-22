@@ -19,7 +19,7 @@ class MemosWatcherBloc extends Bloc<MemosWatcherEvent, MemosWatcherState> {
     @required this.memosRepository,
   }) : super(MemosWatcherInitial()) {
     _memosStreamSubscription =
-        memosRepository.watchAllMemos(null).listen((resource) {
+        memosRepository.watchAllMemos(null, null).listen((resource) {
       add(MemosDataReceived(resource: resource));
     });
   }
@@ -29,8 +29,9 @@ class MemosWatcherBloc extends Bloc<MemosWatcherEvent, MemosWatcherState> {
     MemosWatcherEvent event,
   ) async* {
     if (event is FilterMemos) {
-      _memosStreamSubscription =
-          memosRepository.watchAllMemos(event.filter).listen((resource) {
+      _memosStreamSubscription = memosRepository
+          .watchAllMemos(event.filter, event.tag)
+          .listen((resource) {
         add(MemosDataReceived(resource: resource));
       });
     } else if (event is MemosDataReceived) {

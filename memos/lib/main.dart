@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:memos/core/core_container.dart';
+import 'package:memos/core/presentation/m_colors.dart';
 
 import 'package:memos/feature/memos/presentation/memos_page.dart';
 import 'package:memos/feature/screens/splash_screen.dart';
@@ -47,8 +48,18 @@ class MemosApp extends StatelessWidget {
           return MaterialApp(
             title: 'Memos App',
             theme: ThemeData(
-              primaryColor: Colors.green,
-              primarySwatch: Colors.green,
+              fontFamily: 'Product Sans',
+              primaryColor: MColors.primary,
+              primarySwatch: Colors.blue,
+              floatingActionButtonTheme: FloatingActionButtonThemeData(
+                backgroundColor: MColors.primary,
+              ),
+              appBarTheme: AppBarTheme(
+                color: MColors.primary,
+              ),
+              // chipTheme: Theme.of(context).chipTheme.copyWith(
+              //       backgroundColor: MColors.blue,
+              //     ),
               visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
             home: user.isInitialValue

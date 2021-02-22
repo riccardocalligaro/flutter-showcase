@@ -39,7 +39,10 @@ class MemoLocalModel {
       title: title,
       content: content,
       color: Color(hexToInt(color)),
-      state: MemoState.values.firstWhere((str) => str.toString() == state),
+      state: MemoState.values.firstWhere(
+        (str) => str.toString() == state,
+        orElse: () => MemoState.all,
+      ),
       createdAt: createdAt,
       remindAt: remindAt,
       tags: tags,
@@ -107,10 +110,11 @@ class TagLocalModel {
     @required this.title,
   });
 
-  TagDomainModel toDomainModel() {
+  TagDomainModel toDomainModel(int count) {
     return TagDomainModel(
       id: id,
       title: title,
+      count: count,
     );
   }
 }

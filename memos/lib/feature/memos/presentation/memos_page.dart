@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:memos/core/core_container.dart';
+import 'package:memos/core/presentation/m_custom_placeholder.dart';
+import 'package:memos/core/presentation/no_glow.dart';
 import 'package:memos/feature/login/model/current_user.dart';
 import 'package:memos/feature/memos/domain/model/memo_domain_model.dart';
+import 'package:memos/feature/memos/domain/repository/memos_repository.dart';
 import 'package:memos/feature/memos/presentation/add_memo_page.dart';
 import 'package:memos/feature/memos/presentation/bloc/memos/memos_watcher_bloc.dart';
+import 'package:memos/feature/settings/settings_page.dart';
 import 'package:provider/provider.dart';
 
 class NotesScreen extends StatefulWidget {
@@ -14,10 +19,11 @@ class NotesScreen extends StatefulWidget {
 
 class _NotesScreenState extends State<NotesScreen>
     with SingleTickerProviderStateMixin {
-  int _selectedCategoryIndex = 0;
+  MemoState _filterState;
+  TagDomainModel _filterTag;
+
+  int _selectedCategoryIndex = -1;
   TabController _tabController;
-  final DateFormat _dateFormatter = DateFormat('dd MMM');
-  final DateFormat _timeFormatter = DateFormat('h:mm');
 
   @override
   void initState() {
@@ -25,9 +31,14 @@ class _NotesScreenState extends State<NotesScreen>
 
     _tabController = TabController(initialIndex: 0, length: 4, vsync: this);
 
-    // _tabController.addListener(() {
-    //   print(_tabController.index);
-    // });
+    _tabController.addListener(() {
+      setState(() {
+        _filterState = MemoState.values[_tabController.index];
+      });
+      BlocProvider.of<MemosWatcherBloc>(context).add(
+        FilterMemos(filter: MemoState.values[_tabController.index]),
+      );
+    });
   }
 
   @override
@@ -43,43 +54,31 @@ class _NotesScreenState extends State<NotesScreen>
           BlocBuilder<MemosWatcherBloc, MemosWatcherState>(
             builder: (context, state) {
               if (state is MemosWatcherLoadSuccess) {
-                // return Text(state.toString());
                 return Column(
                   children: [
                     if (state.memosPageData.tags.isEmpty)
                       Container(
                         height: 280.0,
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.tag,
-                                color: Theme.of(context).primaryColor,
-                                size: 81,
-                              ),
-                              const SizedBox(
-                                height: 16,
-                              ),
-                              Text('No tags')
-                            ],
-                          ),
+                        child: MCustomPlaceHolder(
+                          text: 'No tags',
+                          icon: Icons.tag,
+                          showUpdate: false,
                         ),
                       ),
                     if (state.memosPageData.tags.isNotEmpty)
                       Container(
                         height: 280.0,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: state.memosPageData.tags.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            final tag = state.memosPageData.tags[index];
-                            return _buildCategoryCard(
-                              index,
-                              tag.title,
-                              0,
-                            );
-                          },
+                        child: ScrollConfiguration(
+                          behavior: NoGlowBehavior(),
+                          child: ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            scrollDirection: Axis.horizontal,
+                            itemCount: state.memosPageData.tags.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final tag = state.memosPageData.tags[index];
+                              return _buildCategoryCard(index, tag);
+                            },
+                          ),
                         ),
                       ),
                     Padding(
@@ -92,12 +91,14 @@ class _NotesScreenState extends State<NotesScreen>
                         indicatorWeight: 4.0,
                         isScrollable: true,
                         unselectedLabelStyle: TextStyle(
-                          fontSize: 20.0,
+                          fontSize: 18.0,
+                          fontFamily: 'Product Sans',
                           fontWeight: FontWeight.w500,
                         ),
                         labelStyle: TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
+                          fontFamily: 'Product Sans',
                         ),
                         tabs: <Widget>[
                           Tab(child: Text('All')),
@@ -108,19 +109,56 @@ class _NotesScreenState extends State<NotesScreen>
                       ),
                     ),
                     const SizedBox(height: 16.0),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: state.memosPageData.memos.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16.0),
-                          child: _MemoCard(
-                            memo: state.memosPageData.memos[index],
-                          ),
-                        );
-                      },
-                    ),
+                    if (state.memosPageData.memos.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 32.0),
+                        child: MCustomPlaceHolder(
+                          text: 'No notes',
+                          icon: Icons.note,
+                          showUpdate: true,
+                          updateMessage: 'Add note',
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => AddMemoPage(),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    if (state.memosPageData.memos.isNotEmpty)
+                      ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: state.memosPageData.memos.length,
+                        itemBuilder: (context, index) {
+                          final memo = state.memosPageData.memos[index];
+
+                          final DateFormat _dateFormatter =
+                              DateFormat('dd MMMM yyyy');
+
+                          return Card(
+                            child: ListTile(
+                              onTap: () {},
+                              onLongPress: () async {
+                                final MemosRepository memosRepository = sl();
+                                await memosRepository.deleteMemo(memo);
+                              },
+                              title: Text('${memo.title}'),
+                              subtitle: Text(
+                                _dateFormatter.format(
+                                  memo.createdAt,
+                                ),
+                              ),
+                              trailing: IconButton(
+                                icon: Icon(Icons.share),
+                                onPressed: () {},
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     const SizedBox(
                       height: 64,
                     ),
@@ -148,29 +186,55 @@ class _NotesScreenState extends State<NotesScreen>
     );
   }
 
-  Widget _buildCategoryCard(int index, String title, int count) {
+  Widget _buildCategoryCard(int index, TagDomainModel tag) {
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedCategoryIndex = index;
+          if (index != _selectedCategoryIndex) {
+            _selectedCategoryIndex = index;
+            BlocProvider.of<MemosWatcherBloc>(context).add(
+              FilterMemos(
+                filter: _filterState,
+                tag: tag,
+              ),
+            );
+            _filterTag = tag;
+          } else {
+            _selectedCategoryIndex = -1;
+            _filterTag = null;
+            BlocProvider.of<MemosWatcherBloc>(context).add(
+              FilterMemos(
+                filter: _filterState,
+                tag: null,
+              ),
+            );
+          }
         });
       },
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
+        margin: const EdgeInsets.symmetric(
+          vertical: 20.0,
+          horizontal: 10.0,
+        ),
         height: 240.0,
         width: 175.0,
         decoration: BoxDecoration(
           color: _selectedCategoryIndex == index
               ? Color(0xFF417BFB)
-              : Color(0xFFF5F7FB),
+              : Colors.white,
           borderRadius: BorderRadius.circular(20.0),
           boxShadow: [
             _selectedCategoryIndex == index
-                ? BoxShadow(
+                ? const BoxShadow(
                     color: Colors.black26,
                     offset: Offset(0, 2),
-                    blurRadius: 10.0)
-                : BoxShadow(color: Colors.transparent),
+                    blurRadius: 10.0,
+                  )
+                : BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    offset: Offset(0, 2),
+                    blurRadius: 10.0,
+                  ),
           ],
         ),
         child: Column(
@@ -178,9 +242,9 @@ class _NotesScreenState extends State<NotesScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20.0),
               child: Text(
-                title,
+                tag.title,
                 style: TextStyle(
                   color: _selectedCategoryIndex == index
                       ? Colors.white
@@ -191,9 +255,9 @@ class _NotesScreenState extends State<NotesScreen>
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20.0),
               child: Text(
-                count.toString(),
+                '${tag.count}',
                 style: TextStyle(
                   color: _selectedCategoryIndex == index
                       ? Colors.white
@@ -243,77 +307,14 @@ class _TopAppBar extends StatelessWidget {
           Spacer(),
           IconButton(
             icon: Icon(Icons.settings),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => SettingsPage(),
+                ),
+              );
+            },
           )
-        ],
-      ),
-    );
-  }
-}
-
-class _MemoCard extends StatelessWidget {
-  final MemoDomainModel memo;
-
-  const _MemoCard({
-    Key key,
-    @required this.memo,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final DateFormat _dateFormatter = DateFormat('dd MMM');
-    final DateFormat _timeFormatter = DateFormat('h:mm');
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 30.0),
-      padding: const EdgeInsets.all(30.0),
-      decoration: BoxDecoration(
-        color: Color(0xFFF5F7FB),
-        borderRadius: BorderRadius.circular(30.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    memo.title,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 16.0),
-                  Text(
-                    _dateFormatter.format(memo.createdAt),
-                    style: TextStyle(
-                      color: Color(0xFFAFB4C6),
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                height: 50.0,
-                width: 50.0,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: const Icon(
-                  Icons.share,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );

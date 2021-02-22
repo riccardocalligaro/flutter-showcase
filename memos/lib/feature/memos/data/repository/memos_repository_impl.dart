@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
+import 'package:memos/core/infrastructure/error_handler.dart';
 import 'package:memos/core/infrastructure/failures.dart';
 import 'package:memos/core/infrastructure/resource.dart';
 import 'package:memos/feature/memos/data/datasource/memos_local_datasource.dart';
@@ -17,7 +18,10 @@ class MemosRepositoryImpl implements MemosRepository {
   });
 
   @override
-  Stream<Resource<MemosPageData>> watchAllMemos(MemoState filter) async* {
+  Stream<Resource<MemosPageData>> watchAllMemos(
+    MemoState filter,
+    TagDomainModel tag,
+  ) async* {
     yield* Rx.combineLatest3(
       memosLocalDatasource.watchAllMemos(),
       memosLocalDatasource.watchAllTags(),
@@ -27,10 +31,21 @@ class MemosRepositoryImpl implements MemosRepository {
         List<TagLocalModel> tags,
         List<MemosTags> memosTags,
       ) {
-        final domainTags = tags.map((e) => e.toDomainModel()).toList();
+        final domainTags = tags
+            .map(
+              (e) => e.toDomainModel(
+                memosTags.where((m) => m.tagId == e.id).length,
+              ),
+            )
+            .toList();
 
-        final Map<int, TagDomainModel> tagsMap =
-            Map.fromIterable(domainTags, key: (e) => e.id, value: (e) => e);
+        domainTags.sort((b, a) => a.count.compareTo(b.count));
+
+        final Map<String, TagDomainModel> tagsMap = Map.fromIterable(
+          domainTags,
+          key: (e) => e.id,
+          value: (e) => e,
+        );
 
         List<MemoDomainModel> domainMemos = [];
 
@@ -46,11 +61,17 @@ class MemosRepositoryImpl implements MemosRepository {
           domainMemos.add(memo.toDomainModel(tags: tags));
         }
 
-        // domainMemos.sort((b, a) => a.createdAt.compareTo(b.createdAt));
+        domainMemos.sort((b, a) => a.createdAt.compareTo(b.createdAt));
 
-        // if (filter != null && filter != MemoState.all) {
-        //   domainMemos = domainMemos.where((e) => e.state == filter).toList();
-        // }
+        if (filter != null && filter != MemoState.all) {
+          domainMemos = domainMemos.where((e) => e.state == filter).toList();
+        }
+
+        if (tag != null) {
+          domainMemos = domainMemos
+              .where((e) => e.tags.map((e) => e.id).contains(tag.id))
+              .toList();
+        }
 
         return Resource.success(
             data: MemosPageData(
@@ -59,7 +80,7 @@ class MemosRepositoryImpl implements MemosRepository {
         ));
       },
     ).onErrorReturnWith((e) {
-      print(e.toString());
+      print(e);
       return Resource.failed(error: Failure(Exception(e)));
     });
   }
@@ -72,6 +93,7 @@ class MemosRepositoryImpl implements MemosRepository {
       final localModel = memo.toLocalModel();
 
       List<TagLocalModel> localTags = [];
+      List<TagLocalModel> localTagsToAdd = [];
 
       for (final tag in tags) {
         if (tag.id.isEmpty) {
@@ -81,13 +103,14 @@ class MemosRepositoryImpl implements MemosRepository {
             title: tag.title,
           );
 
+          localTagsToAdd.add(newTag);
           localTags.add(newTag);
         } else {
           localTags.add(tag.toLocalModel());
         }
       }
 
-      await memosLocalDatasource.insertTags(localTags);
+      await memosLocalDatasource.insertTags(localTagsToAdd);
 
       List<MemosTags> memosTags = [];
 
@@ -95,20 +118,31 @@ class MemosRepositoryImpl implements MemosRepository {
         memosTags.add(
           MemosTags(
             id: null,
-            memoId: localTag.id,
-            tagId: memo.id,
+            memoId: memo.id,
+            tagId: localTag.id,
           ),
         );
       }
 
-      await memosLocalDatasource.insertMemoTags(memosTags);
-
       await memosLocalDatasource.insertMemo(localModel);
+
+      await memosLocalDatasource.insertMemoTags(memosTags);
 
       return Right(Success());
     } catch (e) {
       print(e);
-      return Left(Failure(e));
+      return Left(Failure(Exception(e)));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Success>> deleteMemo(MemoDomainModel memo) async {
+    try {
+      await memosLocalDatasource.deleteTagsForMemo(memo.id);
+      await memosLocalDatasource.deleteMemo(memo.toLocalModel());
+      return Right(Success());
+    } catch (e, s) {
+      return Left(handleError(e, s));
     }
   }
 }

@@ -145,6 +145,31 @@ class _$MemosLocalDatasource extends MemosLocalDatasource {
                   'created_at': _dateTimeConverter.encode(item.createdAt),
                   'remind_at': _dateTimeConverter.encode(item.remindAt)
                 },
+            changeListener),
+        _memosTagsDeletionAdapter = DeletionAdapter(
+            database,
+            'memos_tags',
+            ['id'],
+            (MemosTags item) => <String, dynamic>{
+                  'id': item.id,
+                  'memo_id': item.memoId,
+                  'tag_id': item.tagId
+                },
+            changeListener),
+        _memoLocalModelDeletionAdapter = DeletionAdapter(
+            database,
+            'memos',
+            ['id'],
+            (MemoLocalModel item) => <String, dynamic>{
+                  'id': item.id,
+                  'title': item.title,
+                  'content': item.content,
+                  'color': item.color,
+                  'state': item.state,
+                  'creator': item.creator,
+                  'created_at': _dateTimeConverter.encode(item.createdAt),
+                  'remind_at': _dateTimeConverter.encode(item.remindAt)
+                },
             changeListener);
 
   final sqflite.DatabaseExecutor database;
@@ -160,6 +185,10 @@ class _$MemosLocalDatasource extends MemosLocalDatasource {
   final InsertionAdapter<MemosTags> _memosTagsInsertionAdapter;
 
   final UpdateAdapter<MemoLocalModel> _memoLocalModelUpdateAdapter;
+
+  final DeletionAdapter<MemosTags> _memosTagsDeletionAdapter;
+
+  final DeletionAdapter<MemoLocalModel> _memoLocalModelDeletionAdapter;
 
   @override
   Stream<List<MemoLocalModel>> watchAllMemos() {
@@ -202,6 +231,23 @@ class _$MemosLocalDatasource extends MemosLocalDatasource {
   }
 
   @override
+  Future<List<MemosTags>> getMemosTagsForMemo(String id) async {
+    return _queryAdapter.queryList('SELECT * FROM memos_tags WHERE memo_id = ?',
+        arguments: <dynamic>[id],
+        mapper: (Map<String, dynamic> row) => MemosTags(
+            id: row['id'] as int,
+            memoId: row['memo_id'] as String,
+            tagId: row['tag_id'] as String));
+  }
+
+  @override
+  Future<void> deleteTagsForMemo(String id) async {
+    await _queryAdapter.queryNoReturn(
+        'DELETE FROM memos_tags WHERE memo_id = ?',
+        arguments: <dynamic>[id]);
+  }
+
+  @override
   Stream<List<TagLocalModel>> watchAllTags() {
     return _queryAdapter.queryListStream('SELECT * FROM tags',
         queryableName: 'tags',
@@ -232,6 +278,16 @@ class _$MemosLocalDatasource extends MemosLocalDatasource {
   Future<void> updateMemo(MemoLocalModel memoLocalModel) async {
     await _memoLocalModelUpdateAdapter.update(
         memoLocalModel, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> deleteMemosTags(List<MemosTags> memo) async {
+    await _memosTagsDeletionAdapter.deleteList(memo);
+  }
+
+  @override
+  Future<void> deleteMemo(MemoLocalModel memo) async {
+    await _memoLocalModelDeletionAdapter.delete(memo);
   }
 }
 

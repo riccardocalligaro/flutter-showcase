@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'package:memos/feature/memos/data/model/memo_local_model.dart';
@@ -47,6 +49,45 @@ class MemoDomainModel {
       creator: creator,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'content': content,
+      'color': color?.value,
+      'state': state?.toString(),
+      'createdAt': createdAt?.millisecondsSinceEpoch,
+      'remindAt': remindAt?.millisecondsSinceEpoch,
+      'tags': tags?.map((x) => x?.toMap())?.toList(),
+      'creator': creator,
+    };
+  }
+
+  factory MemoDomainModel.fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
+
+    return MemoDomainModel(
+      id: map['id'],
+      title: map['title'],
+      content: map['content'],
+      color: Color(map['color']),
+      state: MemoState.values.firstWhere(
+        (str) => str.toString() == map['state'],
+        orElse: () => MemoState.all,
+      ),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
+      remindAt: DateTime.fromMillisecondsSinceEpoch(map['remindAt']),
+      tags: List<TagDomainModel>.from(
+          map['tags']?.map((x) => TagDomainModel.fromMap(x))),
+      creator: map['creator'],
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory MemoDomainModel.fromJson(String source) =>
+      MemoDomainModel.fromMap(json.decode(source));
 }
 
 enum MemoState { all, shared, archived, pinned }
@@ -71,4 +112,27 @@ class TagDomainModel {
 
   @override
   String toString() => 'TagDomainModel(id: $id, title: $title)';
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'count': count,
+    };
+  }
+
+  factory TagDomainModel.fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
+
+    return TagDomainModel(
+      id: map['id'],
+      title: map['title'],
+      count: map['count'],
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory TagDomainModel.fromJson(String source) =>
+      TagDomainModel.fromMap(json.decode(source));
 }

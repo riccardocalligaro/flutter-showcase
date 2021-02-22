@@ -1,5 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart'
-    show FirebaseAuth, GoogleAuthProvider, Result, UserCredential;
+    show FirebaseAuth, GoogleAuthProvider, UserCredential;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart' show GoogleSignIn;
@@ -38,15 +39,17 @@ class _LoginPageState extends State<LoginPage> {
               constraints: const BoxConstraints(
                 maxWidth: 560,
               ),
-              padding:
-                  const EdgeInsets.symmetric(vertical: 100, horizontal: 48),
+              padding: const EdgeInsets.symmetric(
+                vertical: 100,
+                horizontal: 48,
+              ),
               child: Form(
                 key: _loginForm,
                 child: Column(
                   children: <Widget>[
                     const SizedBox(height: 32),
                     const Text(
-                      'Capture anything',
+                      'Sign in',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w500,
@@ -154,7 +157,18 @@ class _LoginPageState extends State<LoginPage> {
         idToken: googleAuth.idToken,
         accessToken: googleAuth.accessToken,
       );
-      await _auth.signInWithCredential(credential);
+      final userCredential = await _auth.signInWithCredential(credential);
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user.uid)
+          .set(
+        {
+          'email': userCredential.user.email,
+          'name': userCredential.user.displayName,
+          'memos': []
+        },
+      );
     } catch (e, s) {
       debugPrint('google signIn failed: $e. $s');
       errMsg = 'Login failed, please try again later.';

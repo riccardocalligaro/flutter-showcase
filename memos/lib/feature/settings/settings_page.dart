@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:memos/core/core_container.dart';
+import 'package:memos/feature/login/login_page.dart';
 import '../../core/data/memos_database.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -20,6 +22,17 @@ class SettingsPage extends StatelessWidget {
               await database.clearAllTables();
             },
           ),
+          ListTile(
+            title: Text('Logout'),
+            onTap: () {
+              FirebaseAuth.instance.signOut();
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => LoginPage(),
+                ),
+              );
+            },
+          )
         ],
       ),
     );

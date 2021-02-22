@@ -257,21 +257,27 @@ class _$MemosLocalDatasource extends MemosLocalDatasource {
   }
 
   @override
+  Future<void> insertMemos(List<MemoLocalModel> memosLocalModels) async {
+    await _memoLocalModelInsertionAdapter.insertList(
+        memosLocalModels, OnConflictStrategy.replace);
+  }
+
+  @override
   Future<void> insertMemo(MemoLocalModel memoLocalModel) async {
     await _memoLocalModelInsertionAdapter.insert(
-        memoLocalModel, OnConflictStrategy.abort);
+        memoLocalModel, OnConflictStrategy.replace);
   }
 
   @override
   Future<void> insertTags(List<TagLocalModel> tags) async {
     await _tagLocalModelInsertionAdapter.insertList(
-        tags, OnConflictStrategy.abort);
+        tags, OnConflictStrategy.replace);
   }
 
   @override
   Future<void> insertMemoTags(List<MemosTags> memosTags) async {
     await _memosTagsInsertionAdapter.insertList(
-        memosTags, OnConflictStrategy.abort);
+        memosTags, OnConflictStrategy.replace);
   }
 
   @override

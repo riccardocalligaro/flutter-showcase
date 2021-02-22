@@ -1,5 +1,3 @@
-import 'package:f_logs/f_logs.dart';
-
 import 'failures.dart';
 
 Failure handleError(

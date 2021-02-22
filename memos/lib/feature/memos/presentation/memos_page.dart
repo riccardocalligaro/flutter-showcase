@@ -35,8 +35,12 @@ class _NotesScreenState extends State<NotesScreen>
       setState(() {
         _filterState = MemoState.values[_tabController.index];
       });
+
       BlocProvider.of<MemosWatcherBloc>(context).add(
-        FilterMemos(filter: MemoState.values[_tabController.index]),
+        FilterMemos(
+          filter: MemoState.values[_tabController.index],
+          tag: _filterTag,
+        ),
       );
     });
   }
@@ -195,7 +199,7 @@ class _NotesScreenState extends State<NotesScreen>
             BlocProvider.of<MemosWatcherBloc>(context).add(
               FilterMemos(
                 filter: _filterState,
-                tag: tag,
+                tag: _filterTag,
               ),
             );
             _filterTag = tag;
@@ -305,6 +309,13 @@ class _TopAppBar extends StatelessWidget {
             ),
           ),
           Spacer(),
+          IconButton(
+            icon: Icon(Icons.sync),
+            onPressed: () {
+              final MemosRepository memosRepository = sl();
+              memosRepository.syncWithRemote();
+            },
+          ),
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {

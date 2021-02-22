@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:memos/core/infrastructure/error_handler.dart';
 import 'package:memos/core/infrastructure/failures.dart';
@@ -128,6 +130,24 @@ class MemosRepositoryImpl implements MemosRepository {
 
       await memosLocalDatasource.insertMemoTags(memosTags);
 
+      await FirebaseFirestore.instance
+          .collection('memos')
+          .doc(memo.id)
+          .set(memo.toMap());
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser.uid)
+          .update(
+        {
+          'memos': FieldValue.arrayUnion(
+            [
+              memo.id,
+            ],
+          ),
+        },
+      );
+
       return Right(Success());
     } catch (e) {
       print(e);
@@ -140,6 +160,108 @@ class MemosRepositoryImpl implements MemosRepository {
     try {
       await memosLocalDatasource.deleteTagsForMemo(memo.id);
       await memosLocalDatasource.deleteMemo(memo.toLocalModel());
+
+      await FirebaseFirestore.instance
+          .collection('memos')
+          .doc(memo.id)
+          .delete();
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser.uid)
+          .update(
+        {
+          'memos': FieldValue.arrayRemove(
+            [memo.id],
+          ),
+        },
+      );
+
+      return Right(Success());
+    } catch (e, s) {
+      return Left(handleError(e, s));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Success>> shareMemo(String id, String email) {
+    // TODO: implement shareMemo
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, Success>> syncWithRemote() async {
+    try {
+      // otteniamo gli id delle memo dell'utente
+      final userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser.uid)
+          .get();
+
+      // tutti gli id delle memo dell'utente
+      final List memoIds = userSnapshot.data()['memos'];
+
+      final memosSnapshot =
+          await FirebaseFirestore.instance.collection('memos').get();
+
+      List<MemoDomainModel> domainMemos = [];
+
+      for (final memoDocument in memosSnapshot.docs) {
+        if (memoIds.contains(memoDocument.id)) {
+          domainMemos.add(MemoDomainModel.fromMap(memoDocument.data()));
+        }
+      }
+
+      List<TagLocalModel> tagsToAdd = [];
+      List<MemoLocalModel> memosToAdd = [];
+      List<MemosTags> memosTagsToAdd = [];
+
+      for (final memo in domainMemos) {
+        final tags = memo.tags;
+
+        final localModel = memo.toLocalModel();
+
+        List<TagLocalModel> localTags = [];
+        List<TagLocalModel> localTagsToAdd = [];
+
+        for (final tag in tags) {
+          if (tag.id.isEmpty) {
+            // è necessario aggiungerli al db
+            final newTag = TagLocalModel(
+              id: Uuid().v4(),
+              title: tag.title,
+            );
+
+            localTagsToAdd.add(newTag);
+            localTags.add(newTag);
+          } else {
+            localTags.add(tag.toLocalModel());
+          }
+        }
+
+        tagsToAdd.addAll(localTagsToAdd);
+
+        List<MemosTags> memosTags = [];
+
+        for (final localTag in localTags) {
+          memosTags.add(
+            MemosTags(
+              id: null,
+              memoId: memo.id,
+              tagId: localTag.id,
+            ),
+          );
+        }
+
+        memosToAdd.add(localModel);
+        memosTagsToAdd.addAll(memosTags);
+      }
+
+      // ora che abbiamo le memo dobbiamo aggiungerle al db corrente
+      await memosLocalDatasource.insertMemos(memosToAdd);
+      await memosLocalDatasource.insertMemoTags(memosTagsToAdd);
+      await memosLocalDatasource.insertTags(tagsToAdd);
+
       return Right(Success());
     } catch (e, s) {
       return Left(handleError(e, s));

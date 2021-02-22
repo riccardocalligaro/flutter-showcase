@@ -1,6 +1,5 @@
 import 'package:floor/floor.dart';
 import 'package:memos/feature/memos/data/model/memo_local_model.dart';
-import 'package:memos/feature/memos/domain/model/memo_domain_model.dart';
 
 @dao
 abstract class MemosLocalDatasource {
@@ -25,13 +24,16 @@ abstract class MemosLocalDatasource {
   @Update(onConflict: OnConflictStrategy.replace)
   Future<void> updateMemo(MemoLocalModel memoLocalModel);
 
-  @insert
+  @Insert(onConflict: OnConflictStrategy.replace)
+  Future<void> insertMemos(List<MemoLocalModel> memosLocalModels);
+
+  @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertMemo(MemoLocalModel memoLocalModel);
 
-  @insert
+  @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertTags(List<TagLocalModel> tags);
 
-  @insert
+  @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertMemoTags(List<MemosTags> memosTags);
 
   @delete

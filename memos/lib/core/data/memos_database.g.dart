@@ -257,6 +257,11 @@ class _$MemosLocalDatasource extends MemosLocalDatasource {
   }
 
   @override
+  Future<void> deleteAllMemosTags() async {
+    await _queryAdapter.queryNoReturn('DELETE FROM memos_tags');
+  }
+
+  @override
   Future<void> insertMemos(List<MemoLocalModel> memosLocalModels) async {
     await _memoLocalModelInsertionAdapter.insertList(
         memosLocalModels, OnConflictStrategy.replace);

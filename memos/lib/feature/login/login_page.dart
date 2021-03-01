@@ -166,7 +166,7 @@ class _LoginPageState extends State<LoginPage> {
         {
           'email': userCredential.user.email,
           'name': userCredential.user.displayName,
-          'memos': []
+          'memos': FieldValue.arrayUnion([]),
         },
       );
     } catch (e, s) {

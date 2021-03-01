@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:memos/feature/memos/presentation/bloc/memos/memos_watcher_bloc.dart';
+import 'package:memos/feature/memos/presentation/bloc/share/share_bloc.dart';
 
 import 'data/repository/memos_repository_impl.dart';
 import 'domain/repository/memos_repository.dart';
@@ -21,6 +22,11 @@ class MemosContainer {
     return [
       BlocProvider<MemosWatcherBloc>(
         create: (BuildContext context) => MemosWatcherBloc(
+          memosRepository: _sl(),
+        ),
+      ),
+      BlocProvider<ShareBloc>(
+        create: (BuildContext context) => ShareBloc(
           memosRepository: _sl(),
         ),
       ),

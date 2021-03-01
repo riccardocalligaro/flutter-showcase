@@ -88,9 +88,7 @@ class _AddMemoPageState extends State<AddMemoPage> {
           runAlignment: WrapAlignment.start,
           horizontalScroll: true,
           key: _tagStateKey,
-
           textField: TagsTextField(
-            // constraintSugd,
             autofocus: false,
             onSubmitted: (String str) {
               // Add item to the data source.
@@ -103,6 +101,7 @@ class _AddMemoPageState extends State<AddMemoPage> {
               });
             },
           ),
+
           itemCount: _items.length, // required
           itemBuilder: (int index) {
             final item = _items[index];
@@ -112,8 +111,6 @@ class _AddMemoPageState extends State<AddMemoPage> {
               activeColor: Theme.of(context).primaryColor,
               index: index, // required
               title: item.title,
-              // removeButton: null,
-              pressEnabled: false,
               removeButton: ItemTagsRemoveButton(
                 onRemoved: () {
                   // Remove the item from the data source.
@@ -124,7 +121,9 @@ class _AddMemoPageState extends State<AddMemoPage> {
                   //required
                   return true;
                 },
-              ),
+              ), // OR null,
+              // onPressed: (item) => print(item),
+              // onLongPressed: (item) => print(item),
               // onPressed: (item) => print(item),
               // onLongPressed: (item) => print(item),
             );

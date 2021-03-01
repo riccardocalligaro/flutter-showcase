@@ -36,6 +36,9 @@ abstract class MemosLocalDatasource {
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertMemoTags(List<MemosTags> memosTags);
 
+  @Query('DELETE FROM memos_tags')
+  Future<void> deleteAllMemosTags();
+
   @delete
   Future<void> deleteMemosTags(List<MemosTags> memo);
 

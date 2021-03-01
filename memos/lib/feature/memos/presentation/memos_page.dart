@@ -9,6 +9,8 @@ import 'package:memos/feature/memos/domain/model/memo_domain_model.dart';
 import 'package:memos/feature/memos/domain/repository/memos_repository.dart';
 import 'package:memos/feature/memos/presentation/add_memo_page.dart';
 import 'package:memos/feature/memos/presentation/bloc/memos/memos_watcher_bloc.dart';
+import 'package:memos/feature/memos/presentation/custom/email_alert.dart';
+import 'package:memos/feature/memos/presentation/memo_page.dart';
 import 'package:memos/feature/settings/settings_page.dart';
 import 'package:provider/provider.dart';
 
@@ -144,7 +146,13 @@ class _NotesScreenState extends State<NotesScreen>
 
                           return Card(
                             child: ListTile(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => MemoPage(memo: memo),
+                                  ),
+                                );
+                              },
                               onLongPress: () async {
                                 final MemosRepository memosRepository = sl();
                                 await memosRepository.deleteMemo(memo);
@@ -157,7 +165,15 @@ class _NotesScreenState extends State<NotesScreen>
                               ),
                               trailing: IconButton(
                                 icon: Icon(Icons.share),
-                                onPressed: () {},
+                                onPressed: () {
+                                  MemosRepository memosRepository = sl();
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) => EmailAlert(
+                                            memoId: memo.id,
+                                          ));
+                                  // memosRepository.shareMemo(memo.id, email);
+                                },
                               ),
                             ),
                           );
@@ -311,9 +327,17 @@ class _TopAppBar extends StatelessWidget {
           Spacer(),
           IconButton(
             icon: Icon(Icons.sync),
-            onPressed: () {
+            onPressed: () async {
               final MemosRepository memosRepository = sl();
-              memosRepository.syncWithRemote();
+              final response = await memosRepository.syncWithRemote();
+              response.fold(
+                (l) => Scaffold.of(context).showSnackBar(
+                  SnackBar(content: Text('Errore aggiornamento')),
+                ),
+                (r) => Scaffold.of(context).showSnackBar(
+                  SnackBar(content: Text('Aggiornato con successo')),
+                ),
+              );
             },
           ),
           IconButton(

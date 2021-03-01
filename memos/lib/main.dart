@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,12 @@ void main() async {
 
   // Wait for dependency injection
   await CoreContainer.init();
+
+  // nel dubbio
+  FirebaseFirestore.instance.settings = Settings(persistenceEnabled: true);
+
+  FirebaseFirestore.instance.settings =
+      Settings(cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
 
   // trasparent status bar
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -57,9 +64,6 @@ class MemosApp extends StatelessWidget {
               appBarTheme: AppBarTheme(
                 color: MColors.primary,
               ),
-              // chipTheme: Theme.of(context).chipTheme.copyWith(
-              //       backgroundColor: MColors.blue,
-              //     ),
               visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
             home: user.isInitialValue

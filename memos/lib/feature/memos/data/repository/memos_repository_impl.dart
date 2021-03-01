@@ -184,9 +184,36 @@ class MemosRepositoryImpl implements MemosRepository {
   }
 
   @override
-  Future<Either<Failure, Success>> shareMemo(String id, String email) {
-    // TODO: implement shareMemo
-    throw UnimplementedError();
+  Future<Either<Failure, Success>> shareMemo(String id, String email) async {
+    try {
+      final userIdToShare = (await FirebaseFirestore.instance
+              .collection('users')
+              .where('email', isEqualTo: email)
+              .get())
+          .docs;
+
+      if (userIdToShare.length == 1) {
+        final userMemos = userIdToShare.first.data()['memos'] as List<dynamic>;
+        if (userMemos.contains(id)) {
+          return Left(MemoAlreadyShared());
+        }
+        // allora abbiamo un utente
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userIdToShare.first.id)
+            .update({
+          'memos': FieldValue.arrayUnion([
+            id,
+          ])
+        });
+      } else {
+        return Left(EmailNotCorrectFailure());
+      }
+
+      return Right(Success());
+    } catch (e, s) {
+      return Left(handleError(e, s));
+    }
   }
 
   @override
@@ -218,6 +245,7 @@ class MemosRepositoryImpl implements MemosRepository {
 
       for (final memo in domainMemos) {
         final tags = memo.tags;
+        print(tags);
 
         final localModel = memo.toLocalModel();
 
@@ -243,6 +271,8 @@ class MemosRepositoryImpl implements MemosRepository {
 
         List<MemosTags> memosTags = [];
 
+        await memosLocalDatasource.deleteAllMemosTags();
+
         for (final localTag in localTags) {
           memosTags.add(
             MemosTags(
@@ -267,4 +297,12 @@ class MemosRepositoryImpl implements MemosRepository {
       return Left(handleError(e, s));
     }
   }
+}
+
+class EmailNotCorrectFailure extends Failure {
+  EmailNotCorrectFailure() : super(null);
+}
+
+class MemoAlreadyShared extends Failure {
+  MemoAlreadyShared() : super(null);
 }

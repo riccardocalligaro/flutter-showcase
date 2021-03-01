@@ -114,7 +114,7 @@ class TagLocalModel {
     return TagDomainModel(
       id: id,
       title: title,
-      count: count,
+      count: count ?? 0,
     );
   }
 }

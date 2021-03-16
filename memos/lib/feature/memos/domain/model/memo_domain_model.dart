@@ -88,6 +88,30 @@ class MemoDomainModel {
 
   factory MemoDomainModel.fromJson(String source) =>
       MemoDomainModel.fromMap(json.decode(source));
+
+  MemoDomainModel copyWith({
+    String id,
+    String title,
+    String content,
+    Color color,
+    MemoState state,
+    DateTime createdAt,
+    DateTime remindAt,
+    List<TagDomainModel> tags,
+    String creator,
+  }) {
+    return MemoDomainModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      color: color ?? this.color,
+      state: state ?? this.state,
+      createdAt: createdAt ?? this.createdAt,
+      remindAt: remindAt ?? this.remindAt,
+      tags: tags ?? this.tags,
+      creator: creator ?? this.creator,
+    );
+  }
 }
 
 enum MemoState { all, shared, archived, pinned }

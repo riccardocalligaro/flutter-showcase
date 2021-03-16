@@ -76,10 +76,11 @@ class MemosRepositoryImpl implements MemosRepository {
         }
 
         return Resource.success(
-            data: MemosPageData(
-          memos: domainMemos,
-          tags: domainTags,
-        ));
+          data: MemosPageData(
+            memos: domainMemos,
+            tags: domainTags,
+          ),
+        );
       },
     ).onErrorReturnWith((e) {
       print(e);
@@ -184,7 +185,11 @@ class MemosRepositoryImpl implements MemosRepository {
   }
 
   @override
-  Future<Either<Failure, Success>> shareMemo(String id, String email) async {
+  Future<Either<Failure, Success>> shareMemo(
+    String id,
+    String email,
+    MemoDomainModel memo,
+  ) async {
     try {
       final userIdToShare = (await FirebaseFirestore.instance
               .collection('users')
@@ -209,6 +214,11 @@ class MemosRepositoryImpl implements MemosRepository {
       } else {
         return Left(EmailNotCorrectFailure());
       }
+      updateMemo(
+        memo.copyWith(
+          state: MemoState.shared,
+        ),
+      );
 
       return Right(Success());
     } catch (e, s) {
@@ -242,6 +252,11 @@ class MemosRepositoryImpl implements MemosRepository {
       List<TagLocalModel> tagsToAdd = [];
       List<MemoLocalModel> memosToAdd = [];
       List<MemosTags> memosTagsToAdd = [];
+      await memosLocalDatasource.deleteAllMemosTags();
+      await memosLocalDatasource.deleteAllMemos();
+
+      await memosLocalDatasource.deleteAllTags();
+      // await memosLocalDatasource.deleteAllMemosTags();
 
       for (final memo in domainMemos) {
         final tags = memo.tags;
@@ -264,14 +279,13 @@ class MemosRepositoryImpl implements MemosRepository {
             localTags.add(newTag);
           } else {
             localTags.add(tag.toLocalModel());
+            localTagsToAdd.add(tag.toLocalModel());
           }
         }
 
         tagsToAdd.addAll(localTagsToAdd);
 
         List<MemosTags> memosTags = [];
-
-        await memosLocalDatasource.deleteAllMemosTags();
 
         for (final localTag in localTags) {
           memosTags.add(
@@ -287,11 +301,40 @@ class MemosRepositoryImpl implements MemosRepository {
         memosTagsToAdd.addAll(memosTags);
       }
 
+      print('set up, need to insert');
+
       // ora che abbiamo le memo dobbiamo aggiungerle al db corrente
-      await memosLocalDatasource.insertMemos(memosToAdd);
-      await memosLocalDatasource.insertMemoTags(memosTagsToAdd);
       await memosLocalDatasource.insertTags(tagsToAdd);
 
+      await memosLocalDatasource.insertMemos(memosToAdd);
+
+      await memosLocalDatasource.insertMemoTags(memosTagsToAdd);
+
+      return Right(Success());
+    } catch (e, s) {
+      return Left(handleError(e, s));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<TagDomainModel>>> getTags() async {
+    try {
+      final tags = await memosLocalDatasource.getTags();
+      return Right(tags.map((e) => e.toDomainModel(0)).toList());
+    } catch (e, s) {
+      return Left(handleError(e, s));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Success>> updateMemo(MemoDomainModel memo) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('memos')
+          .doc(memo.id)
+          .update(memo.toMap());
+
+      await memosLocalDatasource.updateMemo(memo.toLocalModel());
       return Right(Success());
     } catch (e, s) {
       return Left(handleError(e, s));

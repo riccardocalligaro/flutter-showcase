@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:memos/feature/login/model/current_user.dart';
+import 'package:memos/feature/memos/domain/model/memo_domain_model.dart';
 import 'package:memos/feature/memos/presentation/bloc/share/share_bloc.dart';
 import 'package:provider/provider.dart';
 
 class EmailAlert extends StatefulWidget {
   final String memoId;
+  final MemoDomainModel memo;
   EmailAlert({
     Key key,
     @required this.memoId,
+    @required this.memo,
   }) : super(key: key);
 
   @override
@@ -60,14 +63,14 @@ class _EmailAlertState extends State<EmailAlert> {
         BlocBuilder<ShareBloc, ShareState>(
           builder: (context, state) {
             if (state is ShareSuccess) {
-              return FlatButton(
+              return TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
                 child: Text('Chiudi'),
               );
             }
-            return FlatButton(
+            return TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -78,13 +81,18 @@ class _EmailAlertState extends State<EmailAlert> {
         BlocBuilder<ShareBloc, ShareState>(
           builder: (context, state) {
             if (state is ShareInitial) {
-              return FlatButton(
+              return TextButton(
                 onPressed: _emailController.text.isNotEmpty &&
                         _emailController.text !=
                             Provider.of<CurrentUser>(context).data.email
                     ? () {
                         BlocProvider.of<ShareBloc>(context).add(
-                            ShareMemo(_emailController.text, widget.memoId));
+                          ShareMemo(
+                            _emailController.text,
+                            widget.memoId,
+                            widget.memo,
+                          ),
+                        );
                       }
                     : null,
                 child: Text('Aggiungi'),
@@ -92,7 +100,7 @@ class _EmailAlertState extends State<EmailAlert> {
             } else if (state is ShareFailure ||
                 state is ShareUserNotFound ||
                 state is ShareMemoAlreadyShared) {
-              return FlatButton(
+              return TextButton(
                 onPressed: () {
                   BlocProvider.of<ShareBloc>(context).add(ResetShare());
                   _emailController.clear();

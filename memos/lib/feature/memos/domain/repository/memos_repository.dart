@@ -11,9 +11,17 @@ abstract class MemosRepository {
     TagDomainModel tag,
   );
 
+  Future<Either<Failure, List<TagDomainModel>>> getTags();
+
+  Future<Either<Failure, Success>> updateMemo(MemoDomainModel memo);
+
   Future<Either<Failure, Success>> insertMemo(MemoDomainModel memo);
 
   Future<Either<Failure, Success>> deleteMemo(MemoDomainModel memo);
 
-  Future<Either<Failure, Success>> shareMemo(String id, String email);
+  Future<Either<Failure, Success>> shareMemo(
+    String id,
+    String email,
+    MemoDomainModel memo,
+  );
 }

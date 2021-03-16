@@ -60,6 +60,7 @@ class _NotesScreenState extends State<NotesScreen>
           BlocBuilder<MemosWatcherBloc, MemosWatcherState>(
             builder: (context, state) {
               if (state is MemosWatcherLoadSuccess) {
+                print('building,...');
                 return Column(
                   children: [
                     if (state.memosPageData.tags.isEmpty)
@@ -154,8 +155,75 @@ class _NotesScreenState extends State<NotesScreen>
                                 );
                               },
                               onLongPress: () async {
-                                final MemosRepository memosRepository = sl();
-                                await memosRepository.deleteMemo(memo);
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        ListTile(
+                                          leading: Icon(Icons.share),
+                                          title: Text('Share'),
+                                          onTap: () {
+                                            _shareMemo(memo);
+                                          },
+                                        ),
+                                        if (memo.state == MemoState.archived)
+                                          ListTile(
+                                            leading: Icon(Icons.unarchive),
+                                            title: Text('Unarchive'),
+                                            onTap: () {
+                                              _updateMemo(
+                                                memo.copyWith(
+                                                  state: MemoState.all,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        if (memo.state != MemoState.archived)
+                                          ListTile(
+                                            leading: Icon(Icons.archive),
+                                            title: Text('Archive'),
+                                            onTap: () {
+                                              _updateMemo(
+                                                memo.copyWith(
+                                                  state: MemoState.archived,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        if (memo.state == MemoState.pinned)
+                                          ListTile(
+                                            leading: Icon(Icons.push_pin),
+                                            title: Text('Remove from pinned'),
+                                            onTap: () {
+                                              _updateMemo(
+                                                memo.copyWith(
+                                                  state: MemoState.all,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        if (memo.state != MemoState.pinned)
+                                          ListTile(
+                                            leading: Icon(Icons.push_pin),
+                                            title: Text('Pin'),
+                                            onTap: () {
+                                              _updateMemo(
+                                                memo.copyWith(
+                                                  state: MemoState.pinned,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                      ],
+                                    );
+                                  },
+                                );
+                                // final MemosRepository memosRepository = sl();
+                                // await memosRepository.deleteMemo(memo);
                               },
                               title: Text('${memo.title}'),
                               subtitle: Text(
@@ -166,13 +234,7 @@ class _NotesScreenState extends State<NotesScreen>
                               trailing: IconButton(
                                 icon: Icon(Icons.share),
                                 onPressed: () {
-                                  MemosRepository memosRepository = sl();
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) => EmailAlert(
-                                            memoId: memo.id,
-                                          ));
-                                  // memosRepository.shareMemo(memo.id, email);
+                                  _shareMemo(memo);
                                 },
                               ),
                             ),
@@ -185,12 +247,28 @@ class _NotesScreenState extends State<NotesScreen>
                   ],
                 );
               }
-              return Container();
+              return CircularProgressIndicator();
             },
           ),
         ],
       ),
     );
+  }
+
+  void _shareMemo(MemoDomainModel memo) {
+    showDialog(
+      context: context,
+      builder: (context) => EmailAlert(
+        memoId: memo.id,
+        memo: memo,
+      ),
+    );
+  }
+
+  void _updateMemo(MemoDomainModel memo) {
+    final MemosRepository memosRepository = sl();
+    memosRepository.updateMemo(memo);
+    Navigator.pop(context);
   }
 
   Widget _fab() {
@@ -212,13 +290,14 @@ class _NotesScreenState extends State<NotesScreen>
         setState(() {
           if (index != _selectedCategoryIndex) {
             _selectedCategoryIndex = index;
+            _filterTag = tag;
+
             BlocProvider.of<MemosWatcherBloc>(context).add(
               FilterMemos(
                 filter: _filterState,
                 tag: _filterTag,
               ),
             );
-            _filterTag = tag;
           } else {
             _selectedCategoryIndex = -1;
             _filterTag = null;
@@ -331,10 +410,10 @@ class _TopAppBar extends StatelessWidget {
               final MemosRepository memosRepository = sl();
               final response = await memosRepository.syncWithRemote();
               response.fold(
-                (l) => Scaffold.of(context).showSnackBar(
+                (l) => ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Errore aggiornamento')),
                 ),
-                (r) => Scaffold.of(context).showSnackBar(
+                (r) => ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Aggiornato con successo')),
                 ),
               );

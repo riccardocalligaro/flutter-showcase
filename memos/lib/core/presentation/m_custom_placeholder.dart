@@ -38,7 +38,7 @@ class MCustomPlaceHolder extends StatelessWidget {
             ),
           ),
           showUpdate
-              ? FlatButton(
+              ? TextButton(
                   child: Text(
                     updateMessage ?? 'Update',
                     style: TextStyle(

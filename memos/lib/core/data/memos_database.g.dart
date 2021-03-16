@@ -241,6 +241,22 @@ class _$MemosLocalDatasource extends MemosLocalDatasource {
   }
 
   @override
+  Future<List<TagLocalModel>> getTags() async {
+    return _queryAdapter.queryList('SELECT * FROM tags',
+        mapper: (Map<String, dynamic> row) => TagLocalModel(
+            id: row['id'] as String, title: row['title'] as String));
+  }
+
+  @override
+  Future<List<MemosTags>> getMemosTags() async {
+    return _queryAdapter.queryList('SELECT * FROM memos_tags',
+        mapper: (Map<String, dynamic> row) => MemosTags(
+            id: row['id'] as int,
+            memoId: row['memo_id'] as String,
+            tagId: row['tag_id'] as String));
+  }
+
+  @override
   Future<void> deleteTagsForMemo(String id) async {
     await _queryAdapter.queryNoReturn(
         'DELETE FROM memos_tags WHERE memo_id = ?',
@@ -259,6 +275,16 @@ class _$MemosLocalDatasource extends MemosLocalDatasource {
   @override
   Future<void> deleteAllMemosTags() async {
     await _queryAdapter.queryNoReturn('DELETE FROM memos_tags');
+  }
+
+  @override
+  Future<void> deleteAllTags() async {
+    await _queryAdapter.queryNoReturn('DELETE FROM tags');
+  }
+
+  @override
+  Future<void> deleteAllMemos() async {
+    await _queryAdapter.queryNoReturn('DELETE FROM memos');
   }
 
   @override

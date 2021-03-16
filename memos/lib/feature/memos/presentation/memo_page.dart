@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:flutter_tags/flutter_tags.dart';
 import 'package:memos/feature/memos/domain/model/memo_domain_model.dart';
 
 class MemoPage extends StatelessWidget {
@@ -15,6 +14,7 @@ class MemoPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(memo.title),
+        brightness: Brightness.dark,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
@@ -38,6 +38,9 @@ class MemoPage extends StatelessWidget {
           //     );
           //   },
           // ),
+          Text(memo.tags.toString()),
+          Text(memo.state.toString()),
+
           Markdown(
             physics: NeverScrollableScrollPhysics(),
             data: memo.content,

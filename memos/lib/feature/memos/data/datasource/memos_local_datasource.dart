@@ -15,6 +15,12 @@ abstract class MemosLocalDatasource {
   @Query('SELECT * FROM memos_tags WHERE memo_id = :id')
   Future<List<MemosTags>> getMemosTagsForMemo(String id);
 
+  @Query('SELECT * FROM tags')
+  Future<List<TagLocalModel>> getTags();
+
+  @Query('SELECT * FROM memos_tags')
+  Future<List<MemosTags>> getMemosTags();
+
   @Query('DELETE FROM memos_tags WHERE memo_id = :id')
   Future<void> deleteTagsForMemo(String id);
 
@@ -44,4 +50,10 @@ abstract class MemosLocalDatasource {
 
   @delete
   Future<void> deleteMemo(MemoLocalModel memo);
+
+  @Query('DELETE FROM tags')
+  Future<void> deleteAllTags();
+
+  @Query('DELETE FROM memos')
+  Future<void> deleteAllMemos();
 }

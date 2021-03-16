@@ -14,12 +14,12 @@ import 'package:memos/feature/memos/presentation/memo_page.dart';
 import 'package:memos/feature/settings/settings_page.dart';
 import 'package:provider/provider.dart';
 
-class NotesScreen extends StatefulWidget {
+class MemosPage extends StatefulWidget {
   @override
-  _NotesScreenState createState() => _NotesScreenState();
+  _MemosPageState createState() => _MemosPageState();
 }
 
-class _NotesScreenState extends State<NotesScreen>
+class _MemosPageState extends State<MemosPage>
     with SingleTickerProviderStateMixin {
   MemoState _filterState;
   TagDomainModel _filterTag;
@@ -218,12 +218,20 @@ class _NotesScreenState extends State<NotesScreen>
                                               );
                                             },
                                           ),
+                                        ListTile(
+                                          leading: Icon(Icons.delete),
+                                          title: Text('Delete'),
+                                          onTap: () {
+                                            final MemosRepository
+                                                memosRepository = sl();
+                                            memosRepository.deleteMemo(memo);
+                                            Navigator.pop(context);
+                                          },
+                                        ),
                                       ],
                                     );
                                   },
                                 );
-                                // final MemosRepository memosRepository = sl();
-                                // await memosRepository.deleteMemo(memo);
                               },
                               title: Text('${memo.title}'),
                               subtitle: Text(

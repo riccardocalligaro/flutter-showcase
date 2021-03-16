@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:memos/core/infrastructure/m_notifications.dart';
 import 'package:memos/feature/memos/memos_container.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,6 +15,10 @@ class CoreContainer {
 
     final sharedPreferences = await SharedPreferences.getInstance();
     sl.registerLazySingleton(() => sharedPreferences);
+
+    final mNotifications = MNotifications();
+    await mNotifications.initialise();
+    sl.registerLazySingleton(() => mNotifications);
 
     final database =
         await $FloorMemosDatabase.databaseBuilder('museum_zuccante.db').build();

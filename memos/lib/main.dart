@@ -13,10 +13,13 @@ import 'package:provider/provider.dart';
 
 import 'feature/login/login_page.dart';
 import 'feature/login/model/current_user.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 void main() async {
   // Always use this before initializing the firebase app
   WidgetsFlutterBinding.ensureInitialized();
+
+  tz.initializeTimeZones();
 
   await Firebase.initializeApp();
 
@@ -69,7 +72,7 @@ class MemosApp extends StatelessWidget {
             home: user.isInitialValue
                 ? SplashScreen()
                 : user.data != null
-                    ? NotesScreen()
+                    ? MemosPage()
                     : LoginPage(),
           );
         },

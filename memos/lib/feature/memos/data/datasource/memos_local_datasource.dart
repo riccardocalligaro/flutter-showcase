@@ -42,7 +42,7 @@ abstract class MemosLocalDatasource {
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertMemoTags(List<MemosTags> memosTags);
 
-  @Query('DELETE FROM memos_tags')
+  @delete
   Future<void> deleteAllMemosTags();
 
   @delete
@@ -51,9 +51,9 @@ abstract class MemosLocalDatasource {
   @delete
   Future<void> deleteMemo(MemoLocalModel memo);
 
-  @Query('DELETE FROM tags')
+  @delete
   Future<void> deleteAllTags();
 
-  @Query('DELETE FROM memos')
+  @delete
   Future<void> deleteAllMemos();
 }

@@ -76,8 +76,12 @@ class MemoDomainModel {
         (str) => str.toString() == map['state'],
         orElse: () => MemoState.all,
       ),
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
-      remindAt: DateTime.fromMillisecondsSinceEpoch(map['remindAt']),
+      createdAt: map['createdAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'])
+          : null,
+      remindAt: map['remindAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['remindAt'])
+          : null,
       tags: List<TagDomainModel>.from(
           map['tags']?.map((x) => TagDomainModel.fromMap(x))),
       creator: map['creator'],

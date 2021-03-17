@@ -133,16 +133,23 @@ class _LoginPageState extends State<LoginPage> {
       );
       final userCredential = await _auth.signInWithCredential(credential);
 
-      await FirebaseFirestore.instance
+      final document = await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user.uid)
-          .update(
-        {
-          'email': userCredential.user.email,
-          'name': userCredential.user.displayName,
-          'memos': FieldValue.arrayUnion([]),
-        },
-      );
+          .get();
+
+      if (!document.exists) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user.uid)
+            .set(
+          {
+            'email': userCredential.user.email,
+            'name': userCredential.user.displayName,
+            'memos': [],
+          },
+        );
+      }
 
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(

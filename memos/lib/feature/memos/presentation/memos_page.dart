@@ -407,7 +407,7 @@ class _TopAppBar extends StatelessWidget {
           Text(
             username,
             style: const TextStyle(
-              fontSize: 20.0,
+              fontSize: 15.0,
               fontWeight: FontWeight.bold,
             ),
           ),

@@ -131,6 +131,8 @@ class MemosRepositoryImpl implements MemosRepository {
 
       await memosLocalDatasource.insertMemoTags(memosTags);
 
+      // [memos] -> memo
+
       await FirebaseFirestore.instance
           .collection('memos')
           .doc(memo.id)
@@ -254,7 +256,6 @@ class MemosRepositoryImpl implements MemosRepository {
       List<MemosTags> memosTagsToAdd = [];
       await memosLocalDatasource.deleteAllMemosTags();
       await memosLocalDatasource.deleteAllMemos();
-
       await memosLocalDatasource.deleteAllTags();
       // await memosLocalDatasource.deleteAllMemosTags();
 

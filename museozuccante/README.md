@@ -214,6 +214,9 @@ lib
 ### Clean architecture
 <img src="https://i0.wp.com/resocoder.com/wp-content/uploads/2019/08/Clean-Architecture-Flutter-Diagram.png?resize=556%2C707&ssl=1">
 
+<img src="https://miro.medium.com/max/2020/1*twBQBXvePT8eO7FbYcdzTg.png">
+
+
 
 ## Sintesti clean architecture
 

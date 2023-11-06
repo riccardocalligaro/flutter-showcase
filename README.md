@@ -1,6 +1,6 @@
-# Schools project
+# Personal flutter showcase
 
-All my assignments for the school year 2020-2021
+Personal projects mostly made duirng my last school year in the TPSIT class. 
 
 ## 1 milestone: Oct 17, 2020 – Nov 7, 2020
 
